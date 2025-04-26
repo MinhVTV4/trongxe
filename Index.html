@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Menu Quán Ăn (Sửa lỗi hiển thị + Nút vàng)</title>
+    <style>
+        /* === BIẾN CSS === */
+        :root {
+            --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --primary-color: #007bff; --primary-darker: #0056b3; --success-color: #28a745; --danger-color: #dc3545;
+            --warning-light-bg: #fff3cd; --warning-light-text: #664d03; --warning-light-hover: #ffe69c; /* Màu vàng cho nút đã chọn */
+            --light-gray: #f8f9fa; --medium-gray: #dee2e6; --dark-gray: #495057; --text-color: #343a40;
+            --card-bg: #ffffff; --card-border-color: #e9ecef; --card-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            --card-hover-shadow: 0 6px 16px rgba(0,0,0,0.1); --border-radius: 8px; --spacing-unit: 15px;
+            --modal-overlay-bg: rgba(0, 0, 0, 0.6);
+        }
+        /* === THIẾT LẬP CƠ BẢN === */
+        body { font-family: var(--font-family-base); line-height: 1.6; margin: 0; background-color: var(--light-gray); color: var(--text-color); }
+        body.modal-open { overflow: hidden; }
+        .container { max-width: 1200px; margin: auto; padding: calc(var(--spacing-unit) * 1.5); }
+        /* Tiêu đề */
+        h1, h2, h3, h4 { color: var(--text-color); margin-bottom: var(--spacing-unit); }
+        h1 { text-align: center; font-weight: 700; margin-bottom: calc(var(--spacing-unit) * 2); font-size: 2.2em; }
+        h2 { font-weight: 600; color: var(--dark-gray); border-bottom: 1px solid var(--medium-gray); padding-bottom: calc(var(--spacing-unit) * 0.6); margin-bottom: calc(var(--spacing-unit) * 1.5); font-size: 1.6em; }
+        #menu-section > h2, #order-section > h2 { text-align: center; border-bottom: none; margin-bottom: var(--spacing-unit); }
+        h3 { margin: 0; padding: 0; font-size: 1.05em; line-height: 1.4; font-weight: normal; }
+        h4 { font-size: 1.4em; font-weight: 600; margin-top: 0; margin-bottom: calc(var(--spacing-unit)*0.8); }
+        /* --- BỐ CỤC CHUNG --- */
+        .menu-order-container { display: flex; flex-wrap: wrap; gap: calc(var(--spacing-unit) * 2); }
+        #menu-section { flex: 2; min-width: 250px; }
+        #order-section { flex: 1; min-width: 300px; background-color: var(--card-bg); padding: var(--spacing-unit); border-radius: var(--border-radius); box-shadow: var(--card-shadow); align-self: flex-start; position: sticky; top: 20px; }
+        /* === PHẦN MENU === */
+        #menu {}
+        .menu-category-title { font-size: 1.3em; font-weight: 600; line-height: 1.5; text-align: center; color: white; padding: calc(var(--spacing-unit) * 0.8) var(--spacing-unit); background-image: linear-gradient(to right, var(--primary-color), var(--primary-darker)); border-radius: var(--border-radius); box-shadow: 0 2px 5px rgba(0, 86, 179, 0.2); border-bottom: none; margin-top: calc(var(--spacing-unit) * 2.5); margin-bottom: calc(var(--spacing-unit) * 1.5); }
+        .menu-category-title:first-of-type { margin-top: 0; }
+        .menu-category-items { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-unit); margin-bottom: calc(var(--spacing-unit) * 1.5); }
+        /* Thẻ Món Ăn */
+        .menu-item-card { background-color: var(--card-bg); border-radius: var(--border-radius); box-shadow: var(--card-shadow); overflow: hidden; display: flex; flex-direction: column; border: 1px solid var(--card-border-color); transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; position: relative; }
+        .menu-item-card:hover { transform: translateY(-4px); box-shadow: var(--card-hover-shadow); }
+        .menu-item-card img { width: 100%; height: 160px; object-fit: cover; display: block; border-bottom: 1px solid var(--card-border-color); background-color: #e9ecef; }
+        .menu-item-info { padding: var(--spacing-unit); flex-grow: 1; display: flex; flex-direction: column; position: relative; }
+        /* Định dạng tên món ăn Anh/Việt */
+        .menu-item-name-wrapper { margin-bottom: 5px; display: flex; align-items: baseline; flex-wrap: wrap; }
+        .menu-item-name-wrapper h3 { flex-grow: 1; margin-right: 5px; }
+        .en-name { font-weight: 600; color: var(--text-color); margin-right: 0.4em; }
+        .vn-name { font-weight: 400; font-size: 0.9em; color: var(--dark-gray); }
+        /* Icon Info 'i' */
+        .info-icon { display: inline-block; width: 18px; height: 18px; background-color: var(--medium-gray); color: white; border-radius: 50%; text-align: center; font-size: 0.8em; line-height: 18px; font-style: italic; font-weight: bold; cursor: pointer; transition: background-color 0.2s ease; vertical-align: baseline; flex-shrink: 0; margin-left: auto; }
+        .info-icon:hover { background-color: var(--primary-color); }
+        .menu-item-info .price { font-weight: 700; font-size: 1.1em; color: var(--primary-color); margin-bottom: calc(var(--spacing-unit) * 0.8); margin-top: 5px; }
+        /* Bộ chọn số lượng */
+        .quantity-selector { display: flex; align-items: center; margin-bottom: var(--spacing-unit); }
+        .quantity-selector button { width: 30px; height: 30px; padding: 0; font-size: 1.4em; line-height: 1; border: 1px solid var(--medium-gray); background-color: var(--light-gray); color: var(--dark-gray); cursor: pointer; border-radius: 5px; transition: background-color 0.15s ease, border-color 0.15s ease; }
+        .quantity-selector button:hover { background-color: #e2e6ea; }
+        .quantity-selector button:active { background-color: #d6dadf; }
+        .quantity-selector button:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; border-color: var(--primary-color); }
+        .quantity-selector input { width: 45px; height: 28px; text-align: center; border: 1px solid var(--medium-gray); margin: 0 6px; font-size: 1em; font-weight: 600; border-radius: 5px; -moz-appearance: textfield; appearance: textfield; }
+        .quantity-selector input:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 1px; border-color: var(--primary-color); }
+        .quantity-selector input::-webkit-outer-spin-button, .quantity-selector input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+        /* === Nút Thêm vào Order (KHI CHƯA CHỌN) === */
+        .add-to-order-button { width: 100%; padding: 12px; background-color: var(--success-color); color: white; border: 1px solid transparent; border-radius: 5px; cursor: pointer; font-size: 1em; font-weight: 600; margin-top: auto; transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.1s ease; position: relative; z-index: 1; }
+        .add-to-order-button:hover { background-color: #218838; border-color: #1e7e34; }
+        .add-to-order-button:active { background-color: #1e7e34; transform: scale(0.98); }
+        .add-to-order-button:focus-visible { outline: 3px solid var(--success-color); outline-offset: 2px; }
+
+        /* === Nút Thêm vào Order (KHI ĐÃ CHỌN - MÀU VÀNG) === */
+        .add-to-order-button.item-in-order { background-color: var(--warning-light-bg); color: var(--warning-light-text); border-color: var(--warning-light-hover); }
+        .add-to-order-button.item-in-order:hover { background-color: var(--warning-light-hover); border-color: #ffda6a; }
+        .add-to-order-button.item-in-order:active { background-color: #ffdd7a; transform: scale(0.98); }
+        .add-to-order-button.item-in-order:focus-visible { outline: 3px solid var(--warning-light-hover); outline-offset: 2px; }
+
+        /* Thông báo "Đã thêm" */
+        .add-confirmation { position: absolute; bottom: 55px; left: 50%; transform: translateX(-50%) translateY(10px); background-color: rgba(40, 167, 69, 0.95); color: white; padding: 6px 12px; border-radius: 15px; font-size: 0.9em; font-weight: 600; opacity: 0; transition: opacity 0.4s ease-out, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; z-index: 2; white-space: nowrap; }
+        .add-confirmation.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        /* === PHẦN ORDER SUMMARY === */
+        #order-summary h2 { margin-top: 0; border-bottom: 1px solid var(--medium-gray); padding-bottom: var(--spacing-unit); margin-bottom: var(--spacing-unit); font-size: 1.3em; }
+        #order-items { list-style: none; padding: 0; margin: 0 0 var(--spacing-unit) 0; border-bottom: 1px solid var(--card-border-color); padding-bottom: 10px; min-height: 80px; position: relative; }
+        .order-empty-message { text-align: center; color: var(--dark-gray); padding: calc(var(--spacing-unit) * 2) var(--spacing-unit); font-style: italic; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: calc(100% - 30px); }
+        #order-items li { display: flex; justify-content: space-between; align-items: center; padding: 12px 5px; border-bottom: 1px dotted var(--card-border-color); font-size: 0.95em; }
+        #order-items li:last-child { border-bottom: none; }
+        #order-items li span:first-child { flex-grow: 1; margin-right: 10px; line-height: 1.4; font-weight: 500; }
+        #order-items li .order-qty-controls { display: flex; align-items: center; margin: 0 8px; }
+        #order-items li .order-qty-controls button { width: 26px; height: 26px; padding: 0; font-size: 1.2em; line-height: 1; background-color: #f1f3f5; border: 1px solid var(--medium-gray); color: var(--dark-gray); border-radius: 4px; cursor: pointer; margin: 0 5px; transition: background-color 0.15s ease; }
+        #order-items li .order-qty-controls button:hover { background-color: #e2e6ea; }
+        #order-items li .order-qty-controls button:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 1px; }
+        #order-items li .order-qty-controls .quantity { min-width: 25px; text-align: center; font-weight: 600; font-size: 1.05em; }
+        #order-items li .item-total-price { min-width: 85px; text-align: right; font-weight: 600; color: var(--dark-gray); margin: 0 8px; }
+        #order-items li .remove-item { background-color: transparent; color: var(--danger-color); border: 1px solid transparent; width: 28px; height: 28px; padding: 0; font-size: 1.3em; font-weight: bold; line-height: 1; border-radius: 50%; cursor: pointer; transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease; display: flex; align-items: center; justify-content: center; }
+        #order-items li .remove-item:hover { background-color: #fdf0f1; border-color: var(--danger-color); }
+        #order-items li .remove-item:focus-visible { outline: 2px solid var(--danger-color); outline-offset: 1px; background-color: #fdf0f1; border-color: var(--danger-color); }
+        /* Tổng tiền cuối cùng */
+        #order-total p { text-align: right; font-size: 1.25em; font-weight: 600; margin: var(--spacing-unit) 0; }
+        #order-total p strong { color: var(--success-color); font-size: 1.1em; font-weight: 700; margin-left: 8px; }
+        /* PHẦN YÊU CẦU BẾP (TRONG ORDER SECTION) */
+        #kitchen-summary { background-color: #f8f9fa; padding: var(--spacing-unit); border: 1px solid var(--medium-gray); border-radius: var(--border-radius); margin-top: var(--spacing-unit); margin-bottom: calc(var(--spacing-unit) * 1.5); }
+        #kitchen-summary h3 { text-align: center; font-size: 1.2em; color: var(--text-color); margin-bottom: calc(var(--spacing-unit)*0.8); border-bottom: 1px solid var(--medium-gray); padding-bottom: 8px; }
+        #kitchen-items-list { list-style: none; padding: 0; margin: 0; }
+        #kitchen-items-list li { font-size: 1.1em; font-weight: 500; padding: 8px 5px; border-bottom: 1px dotted var(--medium-gray); }
+        #kitchen-items-list li:last-child { border-bottom: none; }
+        #kitchen-items-list li strong { font-weight: 700; margin-right: 10px; display: inline-block; min-width: 30px; text-align: right; }
+        /* Nút Thanh toán */
+        #finish-eating { width: 100%; padding: 14px; font-size: 1.15em; font-weight: 600; background-color: var(--primary-color); color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.15s ease, transform 0.1s ease; }
+        #finish-eating:hover { background-color: #0056b3; }
+        #finish-eating:active { background-color: #004085; transform: scale(0.98); }
+        #finish-eating.hidden { display: none; }
+        #finish-eating:focus-visible { outline: 3px solid var(--primary-color); outline-offset: 2px; }
+        /* --- PHẦN HÓA ĐƠN CUỐI CÙNG (Sau khi bấm thanh toán) --- */
+        #final-bill { background-color: var(--card-bg); padding: calc(var(--spacing-unit) * 1.8); border-radius: var(--border-radius); box-shadow: var(--card-shadow); margin-top: calc(var(--spacing-unit) * 2); border: 1px solid var(--medium-gray); }
+        #final-bill h2 { text-align: center; font-size: 1.8em; }
+        #final-bill ul { list-style: none; padding: 0; margin: 0 0 var(--spacing-unit) 0; border-bottom: 1px solid var(--medium-gray); padding-bottom: var(--spacing-unit); }
+        #final-bill li { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px dotted var(--card-border-color); }
+        #final-bill li:last-child { border-bottom: none; }
+        #final-bill li span:first-child { flex-grow: 1; margin-right: var(--spacing-unit); line-height: 1.4; }
+        #final-bill li span:last-child { font-weight: 600; min-width: 100px; text-align: right; color: var(--dark-gray); }
+        #final-bill p#bill-total-line { text-align: right; font-size: 1.4em; font-weight: 700; margin-top: calc(var(--spacing-unit) * 1.5); margin-bottom: var(--spacing-unit); }
+        #final-bill #bill-total { color: var(--success-color); font-size: 1.1em; margin-left: 10px; }
+        #final-bill p#thank-you-line { text-align: center; font-size: 1.1em; font-weight: 500; color: var(--dark-gray); margin-top: calc(var(--spacing-unit) * 1.5); margin-bottom: calc(var(--spacing-unit) * 1.8); }
+        #final-bill #new-order { display: block; width: 100%; padding: 12px; font-size: 1.1em; font-weight: 600; background-color: var(--dark-gray); color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.15s ease, transform 0.1s ease; }
+        #final-bill #new-order:hover { background-color: #5a6268; }
+        #final-bill #new-order:active { background-color: #545b62; transform: scale(0.98); }
+        #final-bill #new-order:focus-visible { outline: 3px solid var(--dark-gray); outline-offset: 2px; }
+        /* === MODAL CHUNG === */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--modal-overlay-bg); display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s; z-index: 1000; }
+        .modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s linear 0s; }
+        .modal-content { background-color: var(--card-bg); padding: calc(var(--spacing-unit) * 1.5); border-radius: var(--border-radius); box-shadow: 0 5px 20px rgba(0,0,0,0.2); max-width: 500px; width: 90%; position: relative; transform: scale(0.95); transition: transform 0.3s ease; }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
+        .modal-close { position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 2.2em; line-height: 1; color: var(--medium-gray); cursor: pointer; padding: 0; transition: color 0.2s ease; }
+        .modal-close:hover { color: var(--dark-gray); }
+        /* === MODAL INFO MÓN ĂN === */
+        #modal-item-description { font-size: 1em; line-height: 1.7; color: var(--dark-gray); margin-top: var(--spacing-unit); max-height: 60vh; overflow-y: auto; }
+        /* === MODAL CHỌN LOẠI SỢI === */
+        #noodle-choice-modal .modal-content { max-width: 400px; }
+        #noodle-choice-modal h4 { text-align: center; font-size: 1.3em; border-bottom: 1px solid var(--medium-gray); padding-bottom: 10px; margin-bottom: var(--spacing-unit); }
+        .noodle-options { display: flex; justify-content: space-around; gap: 10px; flex-wrap: wrap; }
+        .noodle-option { text-align: center; }
+        .noodle-option button { background-color: var(--light-gray); border: 1px solid var(--medium-gray); color: var(--primary-color); padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 1.1em; font-weight: 600; transition: background-color 0.2s ease, border-color 0.2s ease; min-width: 80px; }
+        .noodle-option button:hover { background-color: #e9ecef; border-color: var(--dark-gray); }
+        .noodle-option button:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+        .noodle-desc { display: block; font-size: 0.85em; color: var(--dark-gray); margin-top: 5px; }
+        .hidden { display: none; }
+        /* === RESPONSIVE === */
+        @media (max-width: 992px) { /* Tablet */ #order-section { position: static; } .container { padding: var(--spacing-unit); } h1 { font-size: 1.8em; } h2 { font-size: 1.4em; } .menu-category-title { font-size: 1.2em; padding: calc(var(--spacing-unit) * 0.6) var(--spacing-unit); } .modal-content { max-width: 90%; } }
+        @media (max-width: 768px) { /* Mobile */ .menu-order-container { flex-direction: column; gap: var(--spacing-unit); } #order-section { width: 100%; margin-top: 0; box-shadow: none; border: 1px solid var(--medium-gray); } .menu-category-items { gap: 10px; } .menu-item-card img { height: 140px; } h3 { font-size: 1em; } .en-name { margin-right: 0.3em; } .vn-name { font-size: 0.85em; } .menu-item-info .price { font-size: 1em; } .add-to-order-button { padding: 10px; font-size: 0.95em; } #kitchen-summary { margin-top: var(--spacing-unit); margin-bottom: var(--spacing-unit); } #kitchen-items-list li { font-size: 1em; } .modal-content { padding: var(--spacing-unit); } h4 { font-size: 1.2em;} #modal-item-description { font-size: 0.95em; } .modal-close { font-size: 2em; top: 5px; right: 10px;} .noodle-options { flex-direction: column; align-items: stretch; gap: 8px; } .noodle-option button { width: 100%;} }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Our Menu / Thực Đơn</h1>
+        <div class="menu-order-container">
+            <section id="menu-section">
+                <h2>Menu</h2>
+                <div id="menu"></div>
+            </section>
+            <section id="order-section">
+                <h2>Your Order / Món Đã Chọn</h2>
+                <div id="order-summary">
+                    <ul id="order-items"><li class="order-empty-message">Loading menu... / Đang tải thực đơn...</li></ul>
+                    <div id="order-total"><p>Total / Tổng cộng: <strong id="total-cost">0 VND</strong></p></div>
+                    <div id="kitchen-summary" class="hidden"><h3>Yêu cầu bếp</h3><ul id="kitchen-items-list"></ul></div>
+                    <button id="finish-eating" class="hidden">Finish Eating / Thanh Toán</button>
+                </div>
+            </section>
+        </div>
+        <div id="final-bill" class="hidden">
+             <h2>Final Bill / Hóa Đơn</h2>
+             <ul id="bill-items"></ul>
+             <p id="bill-total-line">Total Amount / Tổng Thanh Toán: <strong id="bill-total">0 VND</strong></p>
+             <p id="thank-you-line">Thank you! / Cảm ơn!</p>
+             <button id="new-order">New Order / Order Mới</button>
+        </div>
+    </div>
+    <div id="info-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button id="info-modal-close" class="modal-close" aria-label="Đóng">&times;</button>
+            <h4 id="modal-item-name">Item Name</h4>
+            <p id="modal-item-description">Description details...</p>
+        </div>
+    </div>
+    <div id="noodle-choice-modal" class="modal-overlay hidden">
+         <div class="modal-content noodle-choice-content">
+             <button id="noodle-modal-close" class="modal-close" aria-label="Đóng">&times;</button>
+             <h4>Choose Noodle Type:</h4>
+             <div class="noodle-options">
+                 <div class="noodle-option">
+                     <button data-noodle-type="Pho">Phở</button>
+                     <span class="noodle-desc">(Flat rice noodles)</span>
+                 </div>
+                 <div class="noodle-option">
+                     <button data-noodle-type="Mi">Mì</button>
+                     <span class="noodle-desc">(Egg noodles)</span>
+                 </div>
+                 <div class="noodle-option">
+                     <button data-noodle-type="Mien">Miến</button>
+                     <span class="noodle-desc">(Glass noodles)</span>
+                 </div>
+             </div>
+         </div>
+     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // === Dữ liệu Menu (Quay về món gốc + noodleOptions) ===
+            // *** Đảm bảo dữ liệu Cháo và Đồ uống đầy đủ ở đây ***
+             const placeholderImageUrl = 'https://placehold.co/600x400/EEE/31343C?text=Món+Ăn&font=montserrat';
+            const noodleTypes = { Pho: { name: "Phở", vnName: "Phở" }, Mi: { name: "Mì", vnName: "Mì" }, Mien: { name: "Miến", vnName: "Miến" } };
+            const menuData = [
+                 // Phở, Mì, Miến Gốc + Options
+                 { id: 'ga_nuoc', name: 'Chicken Noodle Soup (Phở/Mì/Miến Gà Nước)', vietnameseName: 'Gà Nước', price: 40000, image: placeholderImageUrl, category: 'Phở, Mì, Miến / Noodles', noodleOptions: ['Pho', 'Mi', 'Mien'], description: 'Clear chicken broth simmered with spices, topped with boiled chicken slices or shreds, scallions, and fresh herbs. Served with your choice of noodles.' },
+                 { id: 'ga_tron', name: 'Mixed Noodles with Chicken (Phở/Mì/Miến Gà Trộn)', vietnameseName: 'Gà Trộn', price: 45000, image: placeholderImageUrl, category: 'Phở, Mì, Miến / Noodles', noodleOptions: ['Pho', 'Mi', 'Mien'], description: 'Your choice of noodles mixed with shredded chicken, roasted peanuts, crispy fried shallots, fresh herbs, and a tangy sweet & sour dressing. Served without broth.' },
+                 { id: 'ga_dui_nuoc', name: 'Chicken Thigh Noodle Soup (Phở/Mì/Miến Gà Đùi Nước)', vietnameseName: 'Gà Đùi Nước', price: 45000, image: placeholderImageUrl, category: 'Phở, Mì, Miến / Noodles', noodleOptions: ['Pho', 'Mi', 'Mien'], description: 'Flavorful noodle soup featuring tender, juicy chicken thigh meat in a clear chicken broth, scallions and herbs. Served with your choice of noodles.' },
+                 { id: 'ga_dui_tron', name: 'Mixed Noodles with Chicken Thigh (Phở/Mì/Miến Gà Đùi Trộn)', vietnameseName: 'Gà Đùi Trộn', price: 50000, image: placeholderImageUrl, category: 'Phở, Mì, Miến / Noodles', noodleOptions: ['Pho', 'Mi', 'Mien'], description: 'A refreshing mix of your choice of noodles with succulent chicken thigh meat, roasted peanuts, fried shallots, herbs, and a sweet & sour dressing.' },
+                 { id: 'bo_nuoc', name: 'Beef Noodle Soup (Phở/Mì/Miến Bò Nước)', vietnameseName: 'Bò Nước', price: 40000, image: placeholderImageUrl, category: 'Phở, Mì, Miến / Noodles', noodleOptions: ['Pho', 'Mi', 'Mien'], description: 'Rich beef broth simmered for hours, served with your choice of noodles and thinly sliced beef (select rare, well-done, flank, brisket, or mixed), onions, and herbs.' },
+                 { id: 'bo_tron', name: 'Mixed Noodles with Beef (Phở/Mì/Miến Bò Trộn)', vietnameseName: 'Bò Trộn', price: 45000, image: placeholderImageUrl, category: 'Phở, Mì, Miến / Noodles', noodleOptions: ['Pho', 'Mi', 'Mien'], description: 'Your choice of noodles tossed with savory stir-fried beef, roasted peanuts, fried shallots, fresh herbs, and a balanced sweet & sour dressing.' },
+                 { id: 'ga_bo_nuoc', name: 'Chicken & Beef Noodle Soup (Phở/Mì/Miến Gà Bò Nước)', vietnameseName: 'Gà Bò Nước', price: 45000, image: placeholderImageUrl, category: 'Phở, Mì, Miến / Noodles', noodleOptions: ['Pho', 'Mi', 'Mien'], description: 'A hearty combination of both tender chicken and sliced beef in our signature broth, served with your choice of noodles, onions, and herbs.' },
+                 { id: 'ga_bo_tron', name: 'Mixed Noodles with Chicken & Beef (Phở/Mì/Miến Gà Bò Trộn)', vietnameseName: 'Gà Bò Trộn', price: 50000, image: placeholderImageUrl, category: 'Phở, Mì, Miến / Noodles', noodleOptions: ['Pho', 'Mi', 'Mien'], description: 'The best of both worlds: mixed noodles featuring both shredded chicken and stir-fried beef, combined with peanuts, shallots, herbs, and dressing. Choose your noodle type.' },
+                 // Mì xào (Không có lựa chọn)
+                 { id: 'mi_xao_bo', name: 'Stir-fried Noodles with Beef (Mì xào Bò)', vietnameseName: 'Mì xào Bò', price: 45000, image: placeholderImageUrl, category: 'Mì Xào / Stir-fried Noodles', description: 'Classic stir-fried egg noodles with tender beef slices, bok choy, onions, carrots, and savory sauce.' },
+                 { id: 'mi_xao_tim', name: 'Stir-fried Noodles with Pork Heart (Mì xào Tim)', vietnameseName: 'Mì xào Tim', price: 45000, image: placeholderImageUrl, category: 'Mì Xào / Stir-fried Noodles', description: 'Stir-fried egg noodles featuring carefully prepared, thinly sliced pork heart mixed with assorted vegetables.' },
+                 { id: 'mi_xao_bau_duc', name: 'Stir-fried Noodles with Pork Kidney (Mì xào Bầu dục)', vietnameseName: 'Mì xào Bầu dục', price: 40000, image: placeholderImageUrl, category: 'Mì Xào / Stir-fried Noodles', description: 'Egg noodles stir-fried with meticulously cleaned and sliced pork kidney and various fresh vegetables.' },
+                 { id: 'mi_xao_tim_bau_duc', name: 'Stir-fried Noodles with Pork Heart & Kidney (Mì xào Tim bầu dục)', vietnameseName: 'Mì xào Tim bầu dục', price: 50000, image: placeholderImageUrl, category: 'Mì Xào / Stir-fried Noodles', description: 'A combination stir-fry featuring both sliced pork heart and kidney, served over egg noodles with vegetables.' },
+                 // Cháo (Đảm bảo đầy đủ)
+                 { id: 'chao_ga', name: 'Chicken Congee (Cháo Gà)', vietnameseName: 'Cháo Gà', price: 40000, image: placeholderImageUrl, category: 'Cháo / Congee', description: 'Comforting rice porridge slow-cooked in chicken broth, served topped with shredded chicken, scallions, black pepper, and optional herbs like perilla.' },
+                 { id: 'chao_tim', name: 'Pork Heart Congee (Cháo Tim)', vietnameseName: 'Cháo Tim', price: 40000, image: placeholderImageUrl, category: 'Cháo / Congee', description: 'Smooth rice porridge cooked with tender, thinly sliced pork heart.' },
+                 { id: 'chao_tim_thit_bam', name: 'Pork Heart & Minced Meat Congee (Cháo Tim thịt băm)', vietnameseName: 'Cháo Tim thịt băm', price: 45000, image: placeholderImageUrl, category: 'Cháo / Congee', description: 'A richer version of congee combining both sliced pork heart and savory minced pork in rice porridge.' },
+                 { id: 'chao_thit_bam', name: 'Minced Meat Congee (Cháo Thịt băm)', vietnameseName: 'Cháo Thịt băm', price: 35000, image: placeholderImageUrl, category: 'Cháo / Congee', description: 'Simple yet satisfying rice porridge cooked with seasoned minced pork, typically garnished with scallions and pepper.' },
+                 { id: 'chao_bau_duc', name: 'Pork Kidney Congee (Cháo Bầu dục)', vietnameseName: 'Cháo Bầu dục', price: 40000, image: placeholderImageUrl, category: 'Cháo / Congee', description: 'Rice porridge featuring thinly sliced, well-cleaned pork kidney.' },
+                 { id: 'chao_tim_bau_duc', name: 'Pork Heart & Kidney Congee (Cháo Tim bầu dục)', vietnameseName: 'Cháo Tim bầu dục', price: 45000, image: placeholderImageUrl, category: 'Cháo / Congee', description: 'A hearty rice porridge combining both sliced pork heart and kidney.' },
+                 // Đồ uống (Đảm bảo đầy đủ)
+                 { id: 'tra_da', name: 'Iced Tea (Trà đá)', vietnameseName: 'Trà đá', price: 5000, image: placeholderImageUrl, category: 'Đồ uống / Beverages', description: 'Refreshing Vietnamese-style plain iced tea, usually brewed from green or black tea.' },
+                 { id: 'tra_chanh', name: 'Lemon Iced Tea (Trà chanh)', vietnameseName: 'Trà chanh', price: 15000, image: placeholderImageUrl, category: 'Đồ uống / Beverages', description: 'Classic iced tea sweetened and mixed with fresh lemon juice.' },
+                 { id: 'tra_quat', name: 'Kumquat Iced Tea (Trà quất)', vietnameseName: 'Trà quất', price: 15000, image: placeholderImageUrl, category: 'Đồ uống / Beverages', description: 'Iced tea infused with the unique sweet, sour, and aromatic flavor of kumquat juice.' },
+                 { id: 'tra_chanh_leo', name: 'Passion Fruit Iced Tea (Trà chanh leo)', vietnameseName: 'Trà chanh leo', price: 15000, image: placeholderImageUrl, category: 'Đồ uống / Beverages', description: 'Tropical iced tea blended with tangy passion fruit juice and sweetener.' },
+                 { id: 'nuoc_ngot', name: 'Soft Drink / Soda (Nước ngọt)', vietnameseName: 'Nước ngọt', price: 15000, image: placeholderImageUrl, category: 'Đồ uống / Beverages', description: 'Selection of popular canned or bottled soft drinks (e.g., Coke, Pepsi, Sprite, 7up).' },
+                 { id: 'bo_huc', name: 'Energy Drink (Bò húc)', vietnameseName: 'Bò húc', price: 15000, image: placeholderImageUrl, category: 'Đồ uống / Beverages', description: 'Canned energy drink like Red Bull or similar local brands.' },
+            ];
+
+
+            let currentOrder = {};
+            let tempOrderItem = null;
+            // DOM Elements Refs ... (giữ nguyên)
+            const menuDiv = document.getElementById('menu');
+            const orderItemsUl = document.getElementById('order-items');
+            const totalCostSpan = document.getElementById('total-cost');
+            const finishEatingButton = document.getElementById('finish-eating');
+            const finalBillDiv = document.getElementById('final-bill');
+            const billItemsUl = document.getElementById('bill-items');
+            const billTotalSpan = document.getElementById('bill-total');
+            const newOrderButton = document.getElementById('new-order');
+            const menuSection = document.getElementById('menu-section');
+            const orderSection = document.getElementById('order-section');
+            const kitchenSummaryDiv = document.getElementById('kitchen-summary');
+            const kitchenItemsListUl = document.getElementById('kitchen-items-list');
+            const infoModal = document.getElementById('info-modal');
+            const infoModalContent = infoModal?.querySelector('.modal-content');
+            const infoModalCloseButton = document.getElementById('info-modal-close');
+            const modalItemName = document.getElementById('modal-item-name');
+            const modalItemDescription = document.getElementById('modal-item-description');
+            const noodleChoiceModal = document.getElementById('noodle-choice-modal');
+            const noodleChoiceModalContent = noodleChoiceModal?.querySelector('.modal-content');
+            const noodleModalCloseButton = document.getElementById('noodle-modal-close');
+            const noodleOptionsContainer = noodleChoiceModal?.querySelector('.noodle-options');
+
+
+            function formatCurrency(amount) { return amount.toLocaleString('vi-VN') + ' VND'; }
+
+            // === Display Menu ===
+            function displayMenu() {
+                // ... (code displayMenu giữ nguyên) ...
+                if (!menuDiv) return;
+                menuDiv.innerHTML = '';
+                const groupedMenu = menuData.reduce((acc, item) => { const category = item.category || 'Khác / Others'; if (!acc[category]) acc[category] = []; acc[category].push(item); return acc; }, {});
+                for (const categoryName in groupedMenu) { const categoryTitle = document.createElement('h2'); categoryTitle.classList.add('menu-category-title'); categoryTitle.textContent = categoryName; menuDiv.appendChild(categoryTitle); const categoryItemsContainer = document.createElement('div'); categoryItemsContainer.classList.add('menu-category-items'); menuDiv.appendChild(categoryItemsContainer); groupedMenu[categoryName].forEach(item => { const card = document.createElement('div'); card.classList.add('menu-item-card'); card.dataset.id = item.id; const imgSrc = item.image || ''; const imgAlt = item.name; const imgHTML = `<img src="${imgSrc}" alt="${imgAlt}" loading="lazy" onerror="this.style.display='none'; console.error('Failed to load image: ${imgSrc}')">`; let enName = item.name; let vnName = ''; const nameParts = item.name.split(' ('); if (nameParts.length > 1) { enName = nameParts[0].trim(); vnName = '(' + nameParts[1]; } else { enName = item.name; } card.innerHTML = `${imgHTML}<div class="menu-item-info"><div class="menu-item-name-wrapper"><h3> <span class="en-name">${enName}</span> ${vnName ? `<span class="vn-name">${vnName}</span>` : ''} </h3><span class="info-icon" data-id="${item.id}" title="Info" aria-label="Details for ${enName}">i</span></div><span class="price">${formatCurrency(item.price)}</span><div class="quantity-selector"> <button class="qty-decrease" data-id="${item.id}">-</button> <input type="number" class="qty-input" value="1" min="1" data-id="${item.id}"> <button class="qty-increase" data-id="${item.id}">+</button> </div><button class="add-to-order-button" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}">Add to Order</button></div>`; categoryItemsContainer.appendChild(card); }); }
+            }
+
+            // === Update Order Summary, Kitchen Summary, VÀ NÚT ADD MÀU VÀNG ===
+            function updateOrderSummary() {
+                 if (!orderItemsUl || !kitchenItemsListUl || !kitchenSummaryDiv || !totalCostSpan) return;
+                 orderItemsUl.innerHTML = ''; kitchenItemsListUl.innerHTML = ''; let total = 0; let itemCount = 0;
+                 const sortedItemIds = Object.keys(currentOrder).sort();
+                 sortedItemIds.forEach(orderItemId => {
+                    const item = currentOrder[orderItemId];
+                    if (item.quantity > 0) {
+                        itemCount++;
+                        const listItem = document.createElement('li');
+                        listItem.innerHTML = `<span>${item.specificName || item.name}</span><div class="order-qty-controls"><button class="order-decrease-qty" data-id="${orderItemId}">-</button><span class="quantity">${item.quantity}</span><button class="order-increase-qty" data-id="${orderItemId}">+</button></div><span class="item-total-price">${formatCurrency(item.price * item.quantity)}</span><button class="remove-item" data-id="${orderItemId}">X</button>`;
+                        orderItemsUl.appendChild(listItem);
+                        total += item.price * item.quantity;
+                        const kitchenListItem = document.createElement('li');
+                        const vietnameseName = item.specificVietnameseName || item.vietnameseName || item.name;
+                        kitchenListItem.innerHTML = `<strong>${item.quantity}</strong> x ${vietnameseName}`;
+                        kitchenItemsListUl.appendChild(kitchenListItem);
+                    } else { delete currentOrder[orderItemId]; }
+                 });
+                 totalCostSpan.textContent = formatCurrency(total);
+                 const isEmpty = itemCount === 0;
+                 if(finishEatingButton) finishEatingButton.classList.toggle('hidden', isEmpty);
+                 kitchenSummaryDiv.classList.toggle('hidden', isEmpty);
+                 const existingEmptyMsg = orderItemsUl.querySelector('.order-empty-message');
+                 if (isEmpty && !existingEmptyMsg) { const emptyMsg = document.createElement('li'); emptyMsg.classList.add('order-empty-message'); emptyMsg.textContent = 'Your order is empty / Chưa chọn món nào'; orderItemsUl.appendChild(emptyMsg); }
+                 else if (!isEmpty && existingEmptyMsg) { existingEmptyMsg.remove(); }
+
+                 // *** Cập nhật trạng thái nút Add màu vàng ***
+                 if (menuDiv) {
+                    const allMenuCards = menuDiv.querySelectorAll('.menu-item-card');
+                    allMenuCards.forEach(card => {
+                        const baseItemId = card.dataset.id; // ID gốc của món trên thẻ
+                        const addButton = card.querySelector('.add-to-order-button');
+                        if (addButton) {
+                            // Kiểm tra xem ID gốc hoặc bất kỳ biến thể nào (_pho, _mi, _mien) có trong giỏ hàng không
+                            let isInOrder = !!currentOrder[baseItemId]; // Kiểm tra ID gốc (cho món ko có lựa chọn)
+                            if (!isInOrder) {
+                                // Kiểm tra các biến thể
+                                isInOrder = Object.keys(currentOrder).some(orderKey => orderKey.startsWith(baseItemId + '_'));
+                            }
+                            addButton.classList.toggle('item-in-order', isInOrder); // Thêm/xóa class màu vàng
+                        }
+                    });
+                }
+            }
+
+            // === Show Confirmation Bubble ===
+            function showConfirmation(buttonElement) {
+                 const parentInfo = buttonElement.closest('.menu-item-info'); if (!parentInfo) return; const existingConfirmation = parentInfo.querySelector('.add-confirmation'); if (existingConfirmation) existingConfirmation.remove(); const confirmation = document.createElement('span'); confirmation.classList.add('add-confirmation'); confirmation.textContent = '✓ Added!'; parentInfo.appendChild(confirmation); requestAnimationFrame(() => { requestAnimationFrame(() => { confirmation.classList.add('show'); }); }); setTimeout(() => { confirmation.classList.remove('show'); setTimeout(() => { if(confirmation.parentNode) confirmation.remove(); }, 400); }, 1500);
+            }
+
+             // === Helper: Lấy tên cụ thể cho biến thể ===
+             function getVariationDetails(baseItemId, baseName, baseVnName, noodleTypeKey) {
+                 const noodleInfo = noodleTypes[noodleTypeKey]; if (!noodleInfo) return null;
+                 const specificId = `${baseItemId}_${noodleTypeKey.toLowerCase()}`;
+                 const specificVietnameseName = `${noodleInfo.vnName} ${baseVnName}`;
+                 const baseEnName = baseName.split(' (')[0];
+                 // Cố gắng thay thế (Phở/Mì/Miến...) bằng tên cụ thể
+                 let specificName = baseName.replace(/\(Phở\/Mì\/Miến.*?\)/, `(${specificVietnameseName})`);
+                 // Nếu không thay thế được (do tên gốc không chứa), tạo tên mới
+                 if (specificName === baseName) {
+                     specificName = `${baseEnName} ${noodleInfo.name} (${specificVietnameseName})`;
+                 }
+
+                 return { id: specificId, name: specificName, vietnameseName: specificVietnameseName };
+             }
+
+            // === Modal Handling Functions ===
+            function openInfoModal(itemId) {
+                // ... (code openInfoModal giữ nguyên) ...
+                 if (!infoModal || !modalItemName || !modalItemDescription) return; const itemData = menuData.find(item => item.id === itemId); if (itemData) { modalItemName.textContent = itemData.name; const englishDescription = itemData.description || 'No detailed description available.'; modalItemDescription.innerHTML = englishDescription.replace(/\n/g, '<br>'); infoModal.classList.remove('hidden'); setTimeout(() => { infoModal.classList.add('visible'); document.body.classList.add('modal-open'); }, 10); }
+            }
+            function closeInfoModal() { if (!infoModal) return; infoModal.classList.remove('visible'); document.body.classList.remove('modal-open'); }
+
+            function openNoodleChoiceModal(itemId, quantity, originalButton) {
+                 // ... (code openNoodleChoiceModal giữ nguyên) ...
+                  if (!noodleChoiceModal || !noodleOptionsContainer) return; const itemData = menuData.find(item => item.id === itemId); if (!itemData || !itemData.noodleOptions) return; tempOrderItem = { baseItemId: itemId, baseName: itemData.name, baseVnName: itemData.vietnameseName, price: itemData.price, quantity: quantity, originalButton: originalButton }; noodleChoiceModal.classList.remove('hidden'); setTimeout(() => { noodleChoiceModal.classList.add('visible'); document.body.classList.add('modal-open'); }, 10);
+            }
+            function closeNoodleChoiceModal() { if (!noodleChoiceModal) return; noodleChoiceModal.classList.remove('visible'); document.body.classList.remove('modal-open'); tempOrderItem = null; }
+
+            // === Main Event Listener ===
+            document.body.addEventListener('click', (event) => {
+                const target = event.target; const itemId = target.dataset.id || target.closest('[data-id]')?.dataset.id;
+                // --- Open Info Modal ---
+                if (target.classList.contains('info-icon') && itemId) { openInfoModal(itemId); return; }
+                // --- Close Info Modal ---
+                if (target === infoModalCloseButton || (target === infoModal && !infoModalContent?.contains(event.target))) { closeInfoModal(); return; }
+                // --- Close Noodle Choice Modal ---
+                if (target === noodleModalCloseButton || (target === noodleChoiceModal && !noodleChoiceModalContent?.contains(event.target))) { closeNoodleChoiceModal(); return; }
+
+                // --- Chọn Loại Mì trong Modal ---
+                if (target.closest('.noodle-option button')) {
+                    const noodleTypeKey = target.dataset.noodleType;
+                    if (tempOrderItem && noodleTypeKey) {
+                        const variationDetails = getVariationDetails(tempOrderItem.baseItemId, tempOrderItem.baseName, tempOrderItem.baseVnName, noodleTypeKey);
+                        if (variationDetails) {
+                            const { id: specificId, name: specificName, vietnameseName: specificVietnameseName } = variationDetails;
+                            if (currentOrder[specificId]) { currentOrder[specificId].quantity += tempOrderItem.quantity; }
+                            else {
+                                // Lấy description từ món gốc
+                                const baseItemData = menuData.find(item => item.id === tempOrderItem.baseItemId);
+                                currentOrder[specificId] = {
+                                    name: tempOrderItem.baseName, // Lưu tên gốc để tham chiếu nếu cần
+                                    specificName: specificName, // Tên đầy đủ biến thể
+                                    vietnameseName: tempOrderItem.baseVnName, // Tên Việt gốc
+                                    specificVietnameseName: specificVietnameseName, // Tên Việt biến thể
+                                    price: tempOrderItem.price,
+                                    quantity: tempOrderItem.quantity,
+                                    description: baseItemData?.description || '' // Lấy mô tả từ món gốc
+                                };
+                            }
+                            updateOrderSummary();
+                            showConfirmation(tempOrderItem.originalButton);
+                        }
+                        closeNoodleChoiceModal();
+                    }
+                    return;
+                }
+
+                // --- Các Click Khác ---
+                if (!itemId && !(target.id === 'finish-eating' || target.id === 'new-order')) return;
+                const card = target.closest('.menu-item-card');
+                if (card) { // Click on Menu Card
+                     const input = card.querySelector(`.qty-input[data-id="${itemId}"]`); if (!input && !target.classList.contains('add-to-order-button')) return; let currentVal = input ? parseInt(input.value) : 1; if (isNaN(currentVal) || currentVal < 1) currentVal = 1;
+                     if (target.classList.contains('qty-decrease')) { if (currentVal > 1 && input) input.value = currentVal - 1; }
+                     else if (target.classList.contains('qty-increase')) { if(input) input.value = currentVal + 1; }
+                     else if (target.classList.contains('add-to-order-button') && itemId) {
+                         const quantityToAdd = input ? parseInt(input.value) : 1; const itemData = menuData.find(item => item.id === itemId);
+                         if (itemData && quantityToAdd > 0) {
+                             if (itemData.noodleOptions && itemData.noodleOptions.length > 0) { openNoodleChoiceModal(itemId, quantityToAdd, target); }
+                             else { const price = itemData.price; if (!isNaN(price)) { if (currentOrder[itemId]) { currentOrder[itemId].quantity += quantityToAdd; } else { currentOrder[itemId] = { name: itemData.name, vietnameseName: itemData.vietnameseName, price: price, quantity: quantityToAdd, description: itemData.description }; } if(input) input.value = 1; updateOrderSummary(); showConfirmation(target); } }
+                         }
+                     }
+                } else if (target.closest('#order-items')) { // Click within Order List
+                    const orderListItem = target.closest('li'); const currentItemId = target.closest('[data-id]')?.dataset.id; if (!orderListItem || !currentItemId || !currentOrder[currentItemId]) return;
+                    if (target.classList.contains('order-decrease-qty')) { currentOrder[currentItemId].quantity--; updateOrderSummary(); }
+                    else if (target.classList.contains('order-increase-qty')) { currentOrder[currentItemId].quantity++; updateOrderSummary(); }
+                    else if (target.classList.contains('remove-item')) { delete currentOrder[currentItemId]; updateOrderSummary(); }
+                } else if (target.id === 'finish-eating') { handleFinishEating(); }
+                  else if (target.id === 'new-order') { handleNewOrder(); }
+            });
+
+            // Close Modals with Escape Key
+            document.addEventListener('keydown', (event) => { if (event.key === 'Escape') { if (infoModal?.classList.contains('visible')) closeInfoModal(); if (noodleChoiceModal?.classList.contains('visible')) closeNoodleChoiceModal(); } });
+            // Handle direct input change
+            document.body.addEventListener('change', (event) => { const target = event.target; if (target.classList.contains('qty-input')) { let value = parseInt(target.value); if (isNaN(value) || value < 1) target.value = 1; } });
+
+            function handleFinishEating() {
+                 if (!menuSection || !orderSection || !finalBillDiv || !billItemsUl || !billTotalSpan) return;
+                menuSection.classList.add('hidden'); orderSection.classList.add('hidden'); finalBillDiv.classList.remove('hidden'); window.scrollTo({ top: 0, behavior: 'smooth' });
+                billItemsUl.innerHTML = ''; let billTotal = 0; const sortedItemIds = Object.keys(currentOrder).sort();
+                sortedItemIds.forEach(orderItemId => { const item = currentOrder[orderItemId]; if(item.quantity > 0) { const billListItem = document.createElement('li'); billListItem.innerHTML = `<span>${item.quantity} x ${item.specificName || item.name}</span><span>${formatCurrency(item.price * item.quantity)}</span>`; billItemsUl.appendChild(billListItem); billTotal += item.price * item.quantity; } });
+                if(billTotalSpan) billTotalSpan.textContent = formatCurrency(billTotal);
+            }
+
+            function handleNewOrder() {
+                 if (!finalBillDiv || !menuSection || !orderSection) return; currentOrder = {}; finalBillDiv.classList.add('hidden'); menuSection.classList.remove('hidden'); orderSection.classList.remove('hidden'); const qtyInputs = document.querySelectorAll('.qty-input'); if (qtyInputs.length > 0) qtyInputs.forEach(input => input.value = 1); updateOrderSummary(); window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // Initialize
+            if(menuDiv && orderItemsUl && totalCostSpan && finishEatingButton && finalBillDiv && billItemsUl && billTotalSpan && newOrderButton && menuSection && orderSection && kitchenSummaryDiv && kitchenItemsListUl && infoModal && noodleChoiceModal) { displayMenu(); updateOrderSummary(); }
+            else { console.error("Initialization failed: One or more essential HTML elements are missing."); const container = document.querySelector('.container'); if(container) container.innerHTML = "<h1>Lỗi tải trang. Vui lòng thử lại. (Error loading page. Please try again.)</h1>"; }
+        });
+    </script>
+</body>
+</html>
