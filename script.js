@@ -10,8 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Trip Detail View elements
     const backToListBtn = document.getElementById('back-to-list-btn');
     const detailTripTitle = document.getElementById('detail-trip-title');
-    // Target the new compact summary container
-    const tripSummaryCompactDiv = document.getElementById('trip-summary-compact'); // <-- Mới
+    const tripSummaryCompactDiv = document.getElementById('trip-summary-compact');
 
     // Passenger Management elements
     const addPassengerToggleArea = document.getElementById('add-passenger-toggle-area');
@@ -21,7 +20,110 @@ document.addEventListener('DOMContentLoaded', () => {
     const passengerListDiv = document.getElementById('passenger-list');
     const currentTripIdInput = document.getElementById('current-trip-id');
 
-    const STORAGE_KEY = 'xeGhepTrips_v6'; // Key for version 6
+    // Wake Lock elements
+    const wakeLockButton = document.getElementById('wake-lock-button');
+    const wakeLockStatus = document.getElementById('wake-lock-status');
+
+    const STORAGE_KEY = 'xeGhepTrips_v7'; // Key for version 7
+
+    // === Wake Lock Logic ===
+    let wakeLockSentinel = null; // Variable to store the WakeLockSentinel object
+
+    // Function to request the wake lock
+    const requestWakeLock = async () => {
+        if ('wakeLock' in navigator) {
+            try {
+                wakeLockSentinel = await navigator.wakeLock.request('screen');
+                updateWakeLockStatus(true, "Đang giữ màn hình sáng.");
+
+                // Listen for release events (e.g., tab hidden, system release)
+                wakeLockSentinel.addEventListener('release', () => {
+                    updateWakeLockStatus(false, "Đã tắt giữ màn hình sáng.");
+                    wakeLockSentinel = null; // Clear the sentinel
+                });
+
+            } catch (err) {
+                // Handle errors, e.g., user denied permission, or feature not supported
+                console.error(`${err.name}, ${err.message}`);
+                updateWakeLockStatus(false, `Lỗi: ${err.message}`, true);
+                wakeLockSentinel = null;
+            }
+        } else {
+            updateWakeLockStatus(false, "Trình duyệt không hỗ trợ giữ màn hình sáng.", false, true);
+        }
+    };
+
+    // Function to release the wake lock
+    const releaseWakeLock = async () => {
+        if (wakeLockSentinel !== null) {
+            try {
+                await wakeLockSentinel.release();
+                // The 'release' event listener above will handle UI updates
+            } catch (err) {
+                console.error(`Failed to release wake lock: ${err.name}, ${err.message}`);
+                 // Update UI even if release fails somehow
+                updateWakeLockStatus(false, "Lỗi khi tắt giữ sáng.", true);
+                wakeLockSentinel = null;
+            }
+        }
+    };
+
+    // Function to update the UI (button and status text)
+    const updateWakeLockStatus = (isActive, message, isError = false, isUnsupported = false) => {
+        wakeLockStatus.textContent = message;
+        wakeLockStatus.className = 'status-indicator'; // Reset classes
+        wakeLockButton.disabled = false; // Enable button by default
+
+        if (isActive) {
+            wakeLockButton.classList.add('active');
+            wakeLockButton.innerHTML = '<span class="icon">💡</span> Tắt giữ sáng';
+            wakeLockStatus.classList.add('status-active');
+        } else {
+            wakeLockButton.classList.remove('active');
+            wakeLockButton.innerHTML = '<span class="icon">💡</span> Giữ màn hình sáng';
+            if (isError) {
+                wakeLockStatus.classList.add('status-error');
+            } else if (isUnsupported) {
+                wakeLockStatus.classList.add('status-unsupported');
+                wakeLockButton.disabled = true; // Disable button if unsupported
+            }
+        }
+    };
+
+    // Event listener for the wake lock button
+    if (wakeLockButton) {
+        wakeLockButton.addEventListener('click', () => {
+            if (wakeLockSentinel === null) {
+                requestWakeLock();
+            } else {
+                releaseWakeLock();
+            }
+        });
+    }
+
+    // Release wake lock when page visibility changes
+    const handleVisibilityChange = () => {
+        if (wakeLockSentinel !== null && document.visibilityState === 'hidden') {
+            // Release the lock but keep the button state as active,
+            // so it can be re-acquired automatically if supported
+            // Or simply release and let the user re-activate:
+             releaseWakeLock();
+             // updateWakeLockStatus(false, "Đã tắt giữ sáng do chuyển tab."); // Optional message
+        }
+        // Optional: Re-acquire lock when tab becomes visible again if it was active before
+        // else if (document.visibilityState === 'visible' && wakeLockButton.classList.contains('active')) {
+        //     requestWakeLock();
+        // }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Initial check if wake lock is supported
+    if (!('wakeLock' in navigator)) {
+         updateWakeLockStatus(false, "Trình duyệt không hỗ trợ giữ màn hình sáng.", false, true);
+    }
+    // === End Wake Lock Logic ===
+
 
     // === Data Handling ===
     function getTrips() {
@@ -73,20 +175,12 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Update trip title
         detailTripTitle.textContent = `Chi tiết: ${trip.origin} → ${trip.destination}`;
-
-        // --- Tạo nội dung cho khu vực tóm tắt gọn ---
-        displayTripSummaryCompact(trip); // <-- Gọi hàm mới
-
-        // Display passenger list (table format - tinh gọn)
+        displayTripSummaryCompact(trip);
         displayPassengerList(trip.passengers, tripId);
-
-        // Set current trip ID and reset/hide the add passenger form initially
         currentTripIdInput.value = tripId;
         hideAddPassengerForm();
 
-        // Switch views
         tripListView.classList.add('hidden');
         tripDetailView.classList.remove('hidden');
         window.scrollTo(0, 0);
@@ -143,12 +237,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- HÀM MỚI: Hiển thị tóm tắt chuyến đi dạng gọn ---
     function displayTripSummaryCompact(trip) {
         const bookedSeats = calculateBookedSeats(trip);
         const availableSeats = trip.vehicleSeats - bookedSeats;
 
-        // Sử dụng grid layout đã định nghĩa trong CSS
         let summaryHTML = `
             <div class="summary-item-label">Thời gian:</div>
             <div class="summary-item-value">${formatDate(trip.date)} - ${trip.time}</div>
@@ -163,7 +255,6 @@ document.addEventListener('DOMContentLoaded', () => {
             <div class="summary-item-value">${formatCurrency(trip.pricePerSeat)} / chỗ</div>
         `;
 
-        // Chỉ thêm hàng ghi chú nếu có
         if (trip.notes) {
             summaryHTML += `
                 <div class="summary-item-label">Ghi chú:</div>
@@ -173,14 +264,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         tripSummaryCompactDiv.innerHTML = summaryHTML;
     }
-    // --- Kết thúc displayTripSummaryCompact ---
 
 
-    // --- CẬP NHẬT HÀM NÀY ĐỂ RENDER BẢNG TINH GỌN ---
     function displayPassengerList(passengers, tripId) {
         passengerListDiv.innerHTML = '';
         if (!passengers || passengers.length === 0) {
-            // Giữ nguyên thông báo nếu không có khách
              passengerListDiv.innerHTML = '<div class="passenger-item" style="border:none; justify-content: center; padding: 20px;">Chưa có hành khách nào cho chuyến này.</div>';
             return;
         }
@@ -190,7 +278,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
         });
 
-        passengers.forEach((passenger) => { // Không cần index nữa vì bỏ cột STT
+        passengers.forEach((passenger) => {
             const passengerElement = document.createElement('div');
             passengerElement.classList.add('passenger-item');
 
@@ -201,12 +289,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const { statusText, statusClass } = getStatusInfo(passenger.status);
             const passengerIdentifier = `data-passenger-name="${passenger.name}" data-passenger-contact="${passenger.contact}"`;
 
-            // Tạo HTML cho các cột còn lại
             passengerElement.innerHTML = `
                 <div class="col-name">
                     ${passenger.name}
                     <span class="seat-count">(${passenger.seatsBooked} chỗ)</span>
-                    ${passenger.notes ? `<i style="font-size:0.8em; color: #6c757d; display:block; margin-top:3px;" title="${passenger.notes}">Ghi chú: ${passenger.notes}</i>` : ''}
+                    ${passenger.notes ? `<i title="${passenger.notes}">Ghi chú: ${passenger.notes}</i>` : ''}
                 </div>
                 <div class="col-contact">
                     <a href="tel:${passenger.contact}" title="Gọi ${passenger.name}"><span class="icon icon-phone">☎</span> ${passenger.contact}</a>
@@ -233,7 +320,6 @@ document.addEventListener('DOMContentLoaded', () => {
             passengerListDiv.appendChild(passengerElement);
         });
     }
-    // --- Kết thúc displayPassengerList ---
 
 
     // === Helper Functions ===
@@ -275,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // === Event Listeners ===
+    // === Event Listeners === (Phần này giữ nguyên logic cũ, chỉ thêm phần wake lock ở đầu)
 
     // 1. Add New Trip
     addTripForm.addEventListener('submit', (event) => {
@@ -325,6 +411,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 trips = trips.filter(trip => trip.id !== tripId);
                 saveTrips(trips);
                 displayTrips();
+                 // Release wake lock if active when deleting the currently viewed trip?
+                 // Might be better to let the user manage it manually or release on view change.
             }
         }
     });
@@ -389,9 +477,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             trips[tripIndex].passengers.push(newPassenger);
             saveTrips(trips);
-            // Re-render passenger list and update summary
             displayPassengerList(trips[tripIndex].passengers, tripId);
-            displayTripSummaryCompact(trips[tripIndex]); // <-- Cập nhật tóm tắt gọn
+            displayTripSummaryCompact(trips[tripIndex]);
             hideAddPassengerForm();
         } else {
              alert('Lỗi: Không tìm thấy chuyến đi để cập nhật.');
@@ -433,7 +520,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  saveTrips(trips);
                  displayPassengerList(trips[tripIndex].passengers, tripId);
                  if (needsSummaryUpdate) {
-                     displayTripSummaryCompact(trips[tripIndex]); // <-- Cập nhật tóm tắt gọn
+                     displayTripSummaryCompact(trips[tripIndex]);
                  }
              }
          }
@@ -451,7 +538,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  saveTrips(trips);
                  displayPassengerList(trips[tripIndex].passengers, tripId);
                  if (needsSummaryUpdate) {
-                     displayTripSummaryCompact(trips[tripIndex]); // <-- Cập nhật tóm tắt gọn
+                     displayTripSummaryCompact(trips[tripIndex]);
                  }
              } else if (!newStatus || !validStatuses.includes(newStatus)) {
                  console.warn("Trạng thái mới không hợp lệ:", newStatus);
