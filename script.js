@@ -24,26 +24,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const wakeLockButton = document.getElementById('wake-lock-button');
     const wakeLockStatus = document.getElementById('wake-lock-status');
 
-    const STORAGE_KEY = 'xeGhepTrips_v7'; // Key for version 7
+    const STORAGE_KEY = 'xeGhepTrips_v8'; // Key for version 8
 
     // === Wake Lock Logic ===
-    let wakeLockSentinel = null; // Variable to store the WakeLockSentinel object
+    let wakeLockSentinel = null;
 
-    // Function to request the wake lock
     const requestWakeLock = async () => {
         if ('wakeLock' in navigator) {
             try {
                 wakeLockSentinel = await navigator.wakeLock.request('screen');
                 updateWakeLockStatus(true, "Đang giữ màn hình sáng.");
-
-                // Listen for release events (e.g., tab hidden, system release)
                 wakeLockSentinel.addEventListener('release', () => {
                     updateWakeLockStatus(false, "Đã tắt giữ màn hình sáng.");
-                    wakeLockSentinel = null; // Clear the sentinel
+                    wakeLockSentinel = null;
                 });
-
             } catch (err) {
-                // Handle errors, e.g., user denied permission, or feature not supported
                 console.error(`${err.name}, ${err.message}`);
                 updateWakeLockStatus(false, `Lỗi: ${err.message}`, true);
                 wakeLockSentinel = null;
@@ -53,26 +48,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Function to release the wake lock
     const releaseWakeLock = async () => {
         if (wakeLockSentinel !== null) {
             try {
                 await wakeLockSentinel.release();
-                // The 'release' event listener above will handle UI updates
             } catch (err) {
                 console.error(`Failed to release wake lock: ${err.name}, ${err.message}`);
-                 // Update UI even if release fails somehow
                 updateWakeLockStatus(false, "Lỗi khi tắt giữ sáng.", true);
                 wakeLockSentinel = null;
             }
         }
     };
 
-    // Function to update the UI (button and status text)
     const updateWakeLockStatus = (isActive, message, isError = false, isUnsupported = false) => {
         wakeLockStatus.textContent = message;
-        wakeLockStatus.className = 'status-indicator'; // Reset classes
-        wakeLockButton.disabled = false; // Enable button by default
+        wakeLockStatus.className = 'status-indicator';
+        wakeLockButton.disabled = false;
 
         if (isActive) {
             wakeLockButton.classList.add('active');
@@ -85,12 +76,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 wakeLockStatus.classList.add('status-error');
             } else if (isUnsupported) {
                 wakeLockStatus.classList.add('status-unsupported');
-                wakeLockButton.disabled = true; // Disable button if unsupported
+                wakeLockButton.disabled = true;
             }
         }
     };
 
-    // Event listener for the wake lock button
     if (wakeLockButton) {
         wakeLockButton.addEventListener('click', () => {
             if (wakeLockSentinel === null) {
@@ -101,24 +91,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Release wake lock when page visibility changes
     const handleVisibilityChange = () => {
         if (wakeLockSentinel !== null && document.visibilityState === 'hidden') {
-            // Release the lock but keep the button state as active,
-            // so it can be re-acquired automatically if supported
-            // Or simply release and let the user re-activate:
              releaseWakeLock();
-             // updateWakeLockStatus(false, "Đã tắt giữ sáng do chuyển tab."); // Optional message
         }
-        // Optional: Re-acquire lock when tab becomes visible again if it was active before
-        // else if (document.visibilityState === 'visible' && wakeLockButton.classList.contains('active')) {
-        //     requestWakeLock();
-        // }
     };
-
     document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    // Initial check if wake lock is supported
     if (!('wakeLock' in navigator)) {
          updateWakeLockStatus(false, "Trình duyệt không hỗ trợ giữ màn hình sáng.", false, true);
     }
@@ -174,18 +152,15 @@ document.addEventListener('DOMContentLoaded', () => {
             showTripListView();
             return;
         }
-
         detailTripTitle.textContent = `Chi tiết: ${trip.origin} → ${trip.destination}`;
         displayTripSummaryCompact(trip);
-        displayPassengerList(trip.passengers, tripId);
+        displayPassengerList(trip.passengers, tripId); // Sẽ gọi hàm displayPassengerList đã cập nhật
         currentTripIdInput.value = tripId;
         hideAddPassengerForm();
-
         tripListView.classList.add('hidden');
         tripDetailView.classList.remove('hidden');
         window.scrollTo(0, 0);
     }
-
 
     function showAddPassengerForm() {
         addPassengerToggleArea.classList.add('hidden');
@@ -203,6 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // === Rendering Functions ===
     function displayTrips() {
+        // Giữ nguyên hàm này
         const trips = getTrips();
         tripListDiv.innerHTML = '';
 
@@ -238,6 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function displayTripSummaryCompact(trip) {
+        // Giữ nguyên hàm này
         const bookedSeats = calculateBookedSeats(trip);
         const availableSeats = trip.vehicleSeats - bookedSeats;
 
@@ -266,6 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    // --- CẬP NHẬT HÀM NÀY CHO GIAI ĐOẠN 1 ---
     function displayPassengerList(passengers, tripId) {
         passengerListDiv.innerHTML = '';
         if (!passengers || passengers.length === 0) {
@@ -281,6 +259,10 @@ document.addEventListener('DOMContentLoaded', () => {
         passengers.forEach((passenger) => {
             const passengerElement = document.createElement('div');
             passengerElement.classList.add('passenger-item');
+            // Thêm class 'picked-up' nếu trạng thái là đã đón
+            if (passenger.status === 'picked_up') {
+                passengerElement.classList.add('picked-up');
+            }
 
             const mapSearchUrl = "https://www.google.com/maps/search/?api=1&query=";
             const mapLinkPickup = `${mapSearchUrl}${encodeURIComponent(passenger.pickupAddress)}`;
@@ -294,6 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${passenger.name}
                     <span class="seat-count">(${passenger.seatsBooked} chỗ)</span>
                     ${passenger.notes ? `<i title="${passenger.notes}">Ghi chú: ${passenger.notes}</i>` : ''}
+                    <button class="delete-passenger-x-btn" title="Xóa khách này" data-trip-id="${tripId}" ${passengerIdentifier}>×</button>
                 </div>
                 <div class="col-contact">
                     <a href="tel:${passenger.contact}" title="Gọi ${passenger.name}"><span class="icon icon-phone">☎</span> ${passenger.contact}</a>
@@ -314,12 +297,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     ${passenger.status === 'picked_up' ? `<button class="status-update-btn btn-dropoff" data-trip-id="${tripId}" ${passengerIdentifier} data-new-status="dropped_off" title="Đánh dấu đã trả"><span class="icon">🏁</span> Trả</button>` : ''}
                     ${passenger.status !== 'dropped_off' && passenger.status !== 'cancelled' ? `<button class="status-update-btn btn-cancel" data-trip-id="${tripId}" ${passengerIdentifier} data-new-status="cancelled" title="Hủy chỗ của khách này"><span class="icon">❌</span> Hủy</button>` : ''}
                     ${passenger.status === 'booked' || passenger.status === 'picked_up' ? `<button class="status-update-btn btn-noshow" data-trip-id="${tripId}" ${passengerIdentifier} data-new-status="no_show" title="Đánh dấu khách không đến"><span class="icon">👻</span> Ko đến</button>` : ''}
-                    <button class="delete-passenger-btn" title="Xóa khách này" data-trip-id="${tripId}" ${passengerIdentifier}><span class="icon">🗑️</span> Xóa</button>
-                </div>
+                    </div>
             `;
             passengerListDiv.appendChild(passengerElement);
         });
     }
+    // --- Kết thúc displayPassengerList ---
 
 
     // === Helper Functions ===
@@ -361,9 +344,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // === Event Listeners === (Phần này giữ nguyên logic cũ, chỉ thêm phần wake lock ở đầu)
+    // === Event Listeners ===
 
-    // 1. Add New Trip
+    // 1. Add New Trip (Giữ nguyên)
     addTripForm.addEventListener('submit', (event) => {
         event.preventDefault();
         const newTrip = {
@@ -377,16 +360,12 @@ document.addEventListener('DOMContentLoaded', () => {
             notes: document.getElementById('trip-notes').value.trim(),
             passengers: []
         };
-
         if (!newTrip.date || formatDate(newTrip.date) === newTrip.date) {
-             alert('Ngày đi không hợp lệ. Vui lòng chọn lại.');
-             return;
+             alert('Ngày đi không hợp lệ. Vui lòng chọn lại.'); return;
         }
         if (!newTrip.origin || !newTrip.destination || !newTrip.time || isNaN(newTrip.vehicleSeats) || newTrip.vehicleSeats <= 0 || isNaN(newTrip.pricePerSeat)) {
-            alert('Vui lòng nhập đầy đủ thông tin hợp lệ cho chuyến đi.');
-            return;
+            alert('Vui lòng nhập đầy đủ thông tin hợp lệ cho chuyến đi.'); return;
         }
-
         const trips = getTrips();
         trips.push(newTrip);
         saveTrips(trips);
@@ -394,13 +373,12 @@ document.addEventListener('DOMContentLoaded', () => {
         displayTrips();
     });
 
-    // 2. Click on Trip List (Manage/Delete Trip)
+    // 2. Click on Trip List (Manage/Delete Trip) (Giữ nguyên)
     tripListDiv.addEventListener('click', (event) => {
         const target = event.target.closest('button');
         if (!target) return;
         const tripId = target.dataset.tripId;
         if (!tripId) return;
-
         if (target.classList.contains('manage-btn')) {
             showTripDetailView(tripId);
         } else if (target.classList.contains('delete-btn')) {
@@ -411,70 +389,52 @@ document.addEventListener('DOMContentLoaded', () => {
                 trips = trips.filter(trip => trip.id !== tripId);
                 saveTrips(trips);
                 displayTrips();
-                 // Release wake lock if active when deleting the currently viewed trip?
-                 // Might be better to let the user manage it manually or release on view change.
             }
         }
     });
 
-    // 3. Back to List from Detail View
+    // 3. Back to List from Detail View (Giữ nguyên)
     backToListBtn.addEventListener('click', showTripListView);
 
-    // 4. Show Add Passenger Form
+    // 4. Show Add Passenger Form (Giữ nguyên)
     showAddPassengerFormBtn.addEventListener('click', showAddPassengerForm);
 
-    // 5. Cancel Adding Passenger
+    // 5. Cancel Adding Passenger (Giữ nguyên)
     cancelAddPassengerBtn.addEventListener('click', (event) => {
         event.preventDefault();
         hideAddPassengerForm();
     });
 
-    // 6. Submit Add Passenger Form
+    // 6. Submit Add Passenger Form (Giữ nguyên)
     addPassengerForm.addEventListener('submit', (event) => {
         event.preventDefault();
         const tripId = currentTripIdInput.value;
         if (!tripId) return;
         const trip = findTripById(tripId);
         if (!trip) { alert('Lỗi: Không tìm thấy chuyến đi.'); return; }
-
         const passengerName = document.getElementById('passenger-name').value.trim();
         const passengerContact = document.getElementById('passenger-contact').value.trim();
         const seatsBooked = parseInt(document.getElementById('passenger-seats').value);
         const pickupAddress = document.getElementById('passenger-pickup').value.trim();
         const dropoffAddress = document.getElementById('passenger-dropoff').value.trim();
         const passengerNotes = document.getElementById('passenger-notes').value.trim();
-
         if (!passengerName || !passengerContact || isNaN(seatsBooked) || seatsBooked <= 0 || !pickupAddress || !dropoffAddress) {
-             alert('Vui lòng nhập đầy đủ thông tin khách hàng (tên, SĐT, số chỗ, điểm đón, điểm trả).');
-             return;
+             alert('Vui lòng nhập đầy đủ thông tin khách hàng (tên, SĐT, số chỗ, điểm đón, điểm trả).'); return;
          }
         const currentBookedSeats = calculateBookedSeats(trip);
         if (currentBookedSeats + seatsBooked > trip.vehicleSeats) {
-             alert(`Không đủ chỗ! Chỉ còn ${trip.vehicleSeats - currentBookedSeats} chỗ trống.`);
-             return;
+             alert(`Không đủ chỗ! Chỉ còn ${trip.vehicleSeats - currentBookedSeats} chỗ trống.`); return;
          }
-
-        const newPassenger = {
-            name: passengerName,
-            contact: passengerContact,
-            seatsBooked: seatsBooked,
-            pickupAddress: pickupAddress,
-            dropoffAddress: dropoffAddress,
-            notes: passengerNotes,
-            status: 'booked'
-        };
-
+        const newPassenger = { name: passengerName, contact: passengerContact, seatsBooked: seatsBooked, pickupAddress: pickupAddress, dropoffAddress: dropoffAddress, notes: passengerNotes, status: 'booked' };
         let trips = getTrips();
         const tripIndex = trips.findIndex(t => t.id === tripId);
         if (tripIndex > -1) {
              const existingPassenger = trips[tripIndex].passengers.find(p => p.name === newPassenger.name && p.contact === newPassenger.contact && p.status !== 'cancelled');
              if (existingPassenger) {
                  if (!confirm(`Khách hàng "${newPassenger.name}" (${newPassenger.contact}) đã tồn tại trong chuyến này và chưa bị hủy. Bạn vẫn muốn thêm lượt đặt mới?`)){
-                     hideAddPassengerForm();
-                     return;
+                     hideAddPassengerForm(); return;
                  }
              }
-
             trips[tripIndex].passengers.push(newPassenger);
             saveTrips(trips);
             displayPassengerList(trips[tripIndex].passengers, tripId);
@@ -486,9 +446,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-     // 7. Click on Passenger List (Update Status / Delete Passenger)
+     // --- CẬP NHẬT EVENT LISTENER NÀY CHO GIAI ĐOẠN 1 ---
      passengerListDiv.addEventListener('click', (event) => {
-         const target = event.target.closest('button');
+         const target = event.target.closest('button'); // Chỉ xử lý khi click vào button
          if (!target) return;
 
          const tripId = target.dataset.tripId;
@@ -501,30 +461,31 @@ document.addEventListener('DOMContentLoaded', () => {
          const tripIndex = trips.findIndex(t => t.id === tripId);
          if (tripIndex === -1) { console.error("Lỗi: Không tìm thấy chuyến đi."); return; }
 
+         // Tìm index của khách hàng trong mảng gốc
          const passengerIndex = trips[tripIndex].passengers.findIndex(p => p.name === passengerName && p.contact === passengerContact);
          if (passengerIndex === -1) {
-             console.warn("Cảnh báo: Không tìm thấy hành khách với tên và SĐT này.");
-             showTripDetailView(tripId);
+             console.warn("Cảnh báo: Không tìm thấy hành khách.");
+             showTripDetailView(tripId); // Refresh view
              return;
          }
 
          let needsSummaryUpdate = false;
 
-         // Handle Delete Button
-         if (target.classList.contains('delete-passenger-btn')) {
+         // Xử lý nút xóa 'x' mới
+         if (target.classList.contains('delete-passenger-x-btn')) {
              if (confirm(`Bạn có chắc muốn xóa hành khách "${passengerName}" (${passengerContact})?`)) {
                  if (trips[tripIndex].passengers[passengerIndex].status !== 'cancelled' && trips[tripIndex].passengers[passengerIndex].status !== 'no_show') {
                      needsSummaryUpdate = true;
                  }
                  trips[tripIndex].passengers.splice(passengerIndex, 1);
                  saveTrips(trips);
-                 displayPassengerList(trips[tripIndex].passengers, tripId);
+                 displayPassengerList(trips[tripIndex].passengers, tripId); // Cập nhật danh sách
                  if (needsSummaryUpdate) {
-                     displayTripSummaryCompact(trips[tripIndex]);
+                     displayTripSummaryCompact(trips[tripIndex]); // Cập nhật tóm tắt nếu cần
                  }
              }
          }
-         // Handle Status Update Button
+         // Xử lý nút cập nhật trạng thái
          else if (target.classList.contains('status-update-btn')) {
              const newStatus = target.dataset.newStatus;
              const oldStatus = trips[tripIndex].passengers[passengerIndex].status;
@@ -532,19 +493,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
              if (newStatus && validStatuses.includes(newStatus) && newStatus !== oldStatus) {
                  if ((oldStatus !== 'cancelled' && oldStatus !== 'no_show') !== (newStatus !== 'cancelled' && newStatus !== 'no_show')) {
-                     needsSummaryUpdate = true;
+                     needsSummaryUpdate = true; // Cần cập nhật summary nếu thay đổi trạng thái ảnh hưởng số chỗ
                  }
                  trips[tripIndex].passengers[passengerIndex].status = newStatus;
                  saveTrips(trips);
-                 displayPassengerList(trips[tripIndex].passengers, tripId);
+                 displayPassengerList(trips[tripIndex].passengers, tripId); // Cập nhật danh sách (sẽ tự thêm/xóa class 'picked-up')
                  if (needsSummaryUpdate) {
-                     displayTripSummaryCompact(trips[tripIndex]);
+                     displayTripSummaryCompact(trips[tripIndex]); // Cập nhật tóm tắt nếu cần
                  }
              } else if (!newStatus || !validStatuses.includes(newStatus)) {
                  console.warn("Trạng thái mới không hợp lệ:", newStatus);
              }
          }
      });
+    // --- Kết thúc event listener passengerListDiv ---
 
     // === Initial Load ===
     showTripListView();
