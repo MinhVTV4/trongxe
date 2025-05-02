@@ -230,15 +230,25 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 #passenger-list .passenger-item:last-child { border-bottom: none; }
 
 /* Định nghĩa cột */
-.col-name, .col-contact, .col-pickup, .col-dropoff, .col-status, .col-actions { padding: 12px 10px; display: flex; align-items: center; word-break: break-word; border-right: 1px solid #e9ecef; transition: opacity 0.3s ease, font-weight 0.3s ease, display 0.3s ease, visibility 0.3s ease; /* Cập nhật transition */ }
+.col-name, .col-contact, .col-pickup, .col-dropoff, .col-status, .col-actions { padding: 12px 10px; display: flex; align-items: center; word-break: break-word; border-right: 1px solid #e9ecef; transition: opacity 0.3s ease, font-weight 0.3s ease, display 0.3s ease, visibility 0.3s ease; }
 .passenger-list-header div:last-child, .passenger-item > div:last-child { border-right: none; }
 
 /* Độ rộng cột */
-.col-name { flex: 1 1 180px; min-width: 150px; font-weight: 500; position: relative; padding-right: 30px; }
-.col-name .seat-count { font-weight: normal; font-size: 0.9em; color: #555; margin-left: 5px;}
+.col-name { flex: 1 1 180px; min-width: 150px; position: relative; padding-right: 30px; }
+.col-name .passenger-main-name { /* Class mới cho tên chính */
+    font-weight: 600; /* Đậm hơn */
+    font-size: 1.1em; /* To hơn chút */
+    color: #003f7e; /* Màu đậm hơn */
+    margin-right: 5px; /* Khoảng cách với số chỗ */
+}
+.col-name .seat-count { font-weight: normal; font-size: 0.9em; color: #555; }
 .col-contact { flex: 1 1 130px; min-width: 120px; }
-.col-pickup { flex: 1 1 200px; min-width: 170px; }
-.col-dropoff { flex: 1 1 200px; min-width: 170px; }
+.col-pickup, .col-dropoff { /* Áp dụng chung cho cả đón và trả */
+    flex: 1 1 200px;
+    min-width: 170px;
+    font-size: 1.05em; /* To hơn chút */
+    color: #196a9f; /* Màu xanh đậm hơn */
+}
 .col-status { flex: 0 0 110px; justify-content: center; }
 .col-actions { flex: 0 0 140px; flex-wrap: wrap; gap: 5px; justify-content: center; }
 
@@ -267,30 +277,19 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 .passenger-item.picked-up .col-pickup {
     opacity: 0;
     pointer-events: none;
-    /* Có thể dùng visibility: hidden; nếu muốn hiệu ứng khác */
-    /* visibility: hidden; */
 }
 .passenger-item.picked-up .col-dropoff {
-    font-weight: 600;
+    font-weight: 700; /* Đậm hơn nữa khi đã đón */
+    color: #003f7e; /* Màu đậm nhất */
 }
 
 /* Style cho chế độ "Đang chạy" */
 .passenger-list-container.running-mode .passenger-item.status-cancelled,
-.passenger-list-container.running-mode .passenger-item.status-no_show {
-    display: none; /* Ẩn hoàn toàn khách Hủy/Ko đến */
-}
+.passenger-list-container.running-mode .passenger-item.status-no_show { display: none; }
 .passenger-list-container.running-mode .passenger-item.picked-up .col-contact,
-.passenger-list-container.running-mode .passenger-item.picked-up .col-pickup {
-    /* Style ẩn đã được định nghĩa ở trên */
-}
-.passenger-list-container.running-mode .passenger-item.picked-up .col-dropoff {
-    /* Style đậm đã được định nghĩa ở trên */
-}
-/* === THÊM: Ẩn cột Trạng thái khi đang chạy === */
-.passenger-list-container.running-mode .col-status {
-    display: none; /* Ẩn cột trạng thái */
-}
-/* ========================================= */
+.passenger-list-container.running-mode .passenger-item.picked-up .col-pickup { opacity: 0; pointer-events: none; }
+.passenger-list-container.running-mode .passenger-item.picked-up .col-dropoff { font-weight: 700; color: #003f7e; }
+.passenger-list-container.running-mode .col-status { display: none; }
 
 
 /* Wake Lock Controls Styling */
@@ -343,24 +342,21 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 
     .delete-passenger-x-btn { top: 8px; right: 8px; }
 
-    /* Ẩn cột khi đã đón trên mobile */
-    .passenger-item.picked-up .col-contact,
-    .passenger-item.picked-up .col-pickup { display: none; }
-    /* Ẩn khách Hủy/Ko đến khi đang chạy trên mobile */
-     .passenger-list-container.running-mode .passenger-item.status-cancelled,
-     .passenger-list-container.running-mode .passenger-item.status-no_show { display: none; }
-    /* === THÊM: Ẩn cột Trạng thái khi đang chạy trên mobile === */
+    .passenger-item.picked-up .col-contact, .passenger-item.picked-up .col-pickup { display: none; }
+     .passenger-list-container.running-mode .passenger-item.status-cancelled, .passenger-list-container.running-mode .passenger-item.status-no_show { display: none; }
      .passenger-list-container.running-mode .col-status { display: none; }
-    /* ==================================================== */
-
 
     /* Thêm label */
     .passenger-item .col-name::before { content: "Tên (Số chỗ): "; font-weight: bold; margin-right: 5px; display: inline-block; width: 100px;}
+    /* Làm nổi bật Tên và Địa chỉ trên mobile */
+    .passenger-item .col-name .passenger-main-name { font-size: 1.15em; }
+    .passenger-item .col-pickup, .passenger-item .col-dropoff { font-size: 1.1em; }
+    .passenger-item.picked-up .col-dropoff { font-weight: bold; color: #003f7e; }
+
     .passenger-item .col-contact::before { content: "SĐT: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 100px;}
     .passenger-item .col-pickup::before { content: "Đón: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 100px;}
     .passenger-item .col-dropoff::before { content: "Trả: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 100px;}
-    /* Bỏ label cho cột trạng thái vì đã ẩn */
-    /* .passenger-item .col-status::before { content: "Trạng thái: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 100px;} */
+    /* .passenger-item .col-status::before { content: "Trạng thái: "; ... } */
     .passenger-item .col-actions { justify-content: center; padding-top: 15px; border-bottom: none;}
     .passenger-item .col-actions::before { display: none; }
 
