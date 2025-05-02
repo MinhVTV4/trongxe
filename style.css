@@ -110,6 +110,26 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 .action-button.manage-btn { background-color: #28a745; color: white; }
 .action-button.delete-btn { background-color: #dc3545; color: white; }
 
+/* === View Toggle Controls === */
+.view-toggle-controls {
+    display: flex;
+    justify-content: space-between; /* Đẩy tiêu đề và nút ra 2 bên */
+    align-items: center; /* Căn giữa theo chiều dọc */
+    margin-bottom: 15px; /* Khoảng cách với danh sách */
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+.view-toggle-controls h2 {
+    margin-bottom: 0; /* Bỏ margin bottom mặc định của h2 */
+}
+#view-mode-toggle-btn {
+    background-color: #6f42c1; /* Màu tím */
+    color: white;
+    padding: 8px 15px; /* Nút nhỏ hơn chút */
+    font-size: 0.9em;
+}
+/* ========================== */
+
 /* Trip Detail View */
 #trip-detail-view h3, #trip-detail-view h4 {
     margin-top: 1.5em;
@@ -126,7 +146,7 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
     border-left: 4px solid #007bff;
     border-radius: 6px;
     padding: 15px;
-    margin-bottom: 25px;
+    margin-bottom: 15px; /* Giảm khoảng cách */
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 8px 15px;
@@ -145,6 +165,23 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 .summary-item-value .seat-booked { color: red; font-weight: bold; }
 .summary-item-value .seat-available { color: green; font-weight: bold; }
 .summary-item-value .trip-notes-value { font-style: italic; color: #555;}
+
+/* === Trip Detail Actions Styling === */
+.trip-detail-actions {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px; /* Khoảng cách với phần quản lý khách */
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+.trip-detail-actions .action-button {
+    /* Các nút sẽ có style riêng */
+}
+.start-trip-btn { background-color: #007bff; color: white; }
+.end-trip-btn { background-color: #28a745; color: white; }
+.cancel-trip-btn { background-color: #dc3545; color: white; }
+/* =============================== */
+
 
 /* Add Passenger Form Toggle */
 #add-passenger-toggle-area {
@@ -180,7 +217,7 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
     color: white;
 }
 
-/* Passenger List Table Styling (Giai đoạn 1) */
+/* Passenger List Table Styling */
 .passenger-list-container {
     width: 100%;
     overflow-x: auto;
@@ -217,7 +254,7 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
     align-items: center;
     word-break: break-word;
     border-right: 1px solid #e9ecef;
-    transition: opacity 0.3s ease, font-weight 0.3s ease;
+    transition: opacity 0.3s ease, font-weight 0.3s ease, display 0s ease 0.3s; /* Thêm transition display */
 }
 .passenger-list-header div:last-child,
 .passenger-item > div:last-child {
@@ -304,18 +341,16 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
     cursor: pointer;
     opacity: 0.7;
     transition: opacity 0.2s ease, background-color 0.2s ease;
-    /* Bỏ kế thừa padding từ button chung */
     padding: 0;
-    /* Bỏ kế thừa gap từ button chung */
     gap: 0;
 }
 .delete-passenger-x-btn:hover {
     opacity: 1;
     background-color: #f5c6cb;
-    filter: none; /* Bỏ filter hover chung */
+    filter: none;
 }
 .delete-passenger-x-btn:active {
-     box-shadow: none; /* Bỏ shadow active chung */
+     box-shadow: none;
 }
 
 /* Style khi khách đã được đón */
@@ -323,12 +358,30 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 .passenger-item.picked-up .col-pickup {
     opacity: 0;
     pointer-events: none;
-    /* Hoặc dùng display: none nếu muốn ẩn hoàn toàn */
-    /* display: none; */
+    /* transition: opacity 0.3s ease, visibility 0s linear 0.3s; */ /* Delay visibility hidden */
+    /* visibility: hidden; */ /* Có thể dùng visibility thay opacity */
 }
 .passenger-item.picked-up .col-dropoff {
     font-weight: 600;
 }
+
+/* === Style cho chế độ "Đang chạy" === */
+/* Khi container có class 'running-mode', ẩn khách Hủy/Không đến */
+.passenger-list-container.running-mode .passenger-item.status-cancelled,
+.passenger-list-container.running-mode .passenger-item.status-no_show {
+    display: none;
+}
+/* Đồng thời áp dụng style ẩn/hiện cho khách đã đón */
+.passenger-list-container.running-mode .passenger-item.picked-up .col-contact,
+.passenger-list-container.running-mode .passenger-item.picked-up .col-pickup {
+    opacity: 0;
+    pointer-events: none;
+}
+.passenger-list-container.running-mode .passenger-item.picked-up .col-dropoff {
+    font-weight: 600;
+}
+/* ================================= */
+
 
 /* Wake Lock Controls Styling */
 .wake-lock-controls {
@@ -344,84 +397,44 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
     font-size: 0.95em;
     padding: 8px 15px;
 }
-#wake-lock-button:hover {
-    background-color: #e0a800;
-    filter: none;
-}
-#wake-lock-button.active {
-    background-color: #28a745;
-    color: white;
-}
-#wake-lock-button.active:hover {
-    background-color: #218838;
-}
-#wake-lock-status {
-    display: block;
-    margin-top: 8px;
-    font-size: 0.9em;
-    min-height: 1.2em;
-}
+#wake-lock-button:hover { background-color: #e0a800; filter: none; }
+#wake-lock-button.active { background-color: #28a745; color: white; }
+#wake-lock-button.active:hover { background-color: #218838; }
+#wake-lock-status { display: block; margin-top: 8px; font-size: 0.9em; min-height: 1.2em; }
 #wake-lock-status.status-active { color: green; font-weight: bold; }
 #wake-lock-status.status-error,
 #wake-lock-status.status-unsupported { color: #dc3545; }
 
 
-/* === Backup & Restore Section Styling === */
+/* Backup & Restore Section Styling */
 #backup-restore-section {
     margin-top: 30px;
-    border-top: 2px solid #0056b3; /* Đường kẻ phân cách */
+    border-top: 2px solid #0056b3;
 }
-#backup-restore-section h2 {
-    color: #0056b3;
-}
-#backup-restore-section p {
-    font-size: 0.95em;
-    color: #6c757d;
-    margin-bottom: 15px;
-}
-.backup-controls {
-    display: flex;
-    flex-direction: column; /* Xếp chồng lên nhau */
-    gap: 15px; /* Khoảng cách giữa các phần tử */
-}
-#backup-data-textarea {
-    width: 100%;
-    font-family: monospace; /* Font chữ đều cho dễ đọc JSON */
-    font-size: 0.9em;
-    border-color: #ced4da;
-    min-height: 100px; /* Chiều cao tối thiểu */
-}
-#backup-button, #restore-button {
-    align-self: flex-start; /* Chỉ chiếm độ rộng cần thiết */
-}
-#backup-button {
-    background-color: #17a2b8; /* Màu xanh dương */
-    color: white;
-}
-#restore-button {
-    background-color: #ffc107; /* Màu vàng */
-    color: #343a40;
-}
-#restore-status {
-    font-size: 0.9em;
-    font-weight: bold;
-    min-height: 1.2em;
-}
+#backup-restore-section h2 { color: #0056b3; }
+#backup-restore-section p { font-size: 0.95em; color: #6c757d; margin-bottom: 15px; }
+.backup-controls { display: flex; flex-direction: column; gap: 15px; }
+#backup-data-textarea { width: 100%; font-family: monospace; font-size: 0.9em; border-color: #ced4da; min-height: 100px; }
+#backup-button, #restore-button { align-self: flex-start; }
+#backup-button { background-color: #17a2b8; color: white; }
+#restore-button { background-color: #ffc107; color: #343a40; }
+#restore-status { font-size: 0.9em; font-weight: bold; min-height: 1.2em; }
 #restore-status.status-success { color: green; }
 #restore-status.status-error { color: red; }
-/* ====================================== */
 
 
 /* Responsive */
 @media (max-width: 768px) {
     /* Responsive cho tóm tắt chuyến đi */
-    #trip-summary-compact {
-        grid-template-columns: 100px 1fr;
-        gap: 5px 10px;
-        padding: 10px 12px;
-    }
+    #trip-summary-compact { grid-template-columns: 100px 1fr; gap: 5px 10px; padding: 10px 12px; }
     .summary-item-label { text-align: left; }
 
+    /* Responsive cho nút chuyển đổi view */
+    .view-toggle-controls { flex-direction: column; align-items: flex-start; gap: 10px;}
+    #view-mode-toggle-btn { align-self: flex-end; } /* Đẩy nút sang phải */
+
+    /* Responsive cho nút hành động chuyến đi */
+    .trip-detail-actions { justify-content: center; } /* Căn giữa nút trên mobile */
 
     /* Responsive cho bảng danh sách khách */
     .passenger-list-header { display: none; }
@@ -441,8 +454,13 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 
     .delete-passenger-x-btn { top: 8px; right: 8px; }
 
+    /* Ẩn cột khi đã đón trên mobile */
     .passenger-item.picked-up .col-contact,
     .passenger-item.picked-up .col-pickup { display: none; }
+    /* Ẩn khách Hủy/Ko đến khi đang chạy trên mobile */
+     .passenger-list-container.running-mode .passenger-item.status-cancelled,
+     .passenger-list-container.running-mode .passenger-item.status-no_show { display: none; }
+
 
     /* Thêm label */
     .passenger-item .col-name::before { content: "Tên (Số chỗ): "; font-weight: bold; margin-right: 5px; display: inline-block; width: 100px;}
