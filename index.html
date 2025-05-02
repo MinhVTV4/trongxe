@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Xe Ghép v5</title> <link rel="stylesheet" href="style.css">
+    <title>Quản lý Xe Ghép v6</title> <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>Quản lý Chuyến Đi Xe Ghép</h1>
@@ -40,7 +40,7 @@
     <div id="trip-detail-view" class="hidden"> <button id="back-to-list-btn">← Quay lại Danh sách</button>
         <div class="card">
             <h2 id="detail-trip-title">Chi tiết chuyến đi</h2>
-            <div id="trip-summary-table">
+            <div id="trip-summary-compact">
                 <p>Đang tải thông tin chuyến đi...</p>
             </div>
             <h3><span class="icon">👥</span> Quản lý Hành Khách</h3>
@@ -73,18 +73,14 @@
             <h4>Danh sách hành khách đã đặt:</h4>
             <div class="passenger-list-container">
                 <div class="passenger-list-header">
-                    <div class="col-stt">STT</div>
-                    <div class="col-name">Tên khách</div>
-                    <div class="col-contact">SĐT</div>
-                    <div class="col-seats">Số chỗ</div>
+                    <div class="col-name">Tên khách (Số chỗ)</div> <div class="col-contact">SĐT</div>
                     <div class="col-pickup">Điểm đón</div>
                     <div class="col-dropoff">Điểm trả</div>
                     <div class="col-status">Trạng thái</div>
                     <div class="col-actions">Hành động</div>
                 </div>
                 <div id="passenger-list">
-                    <p>Đang tải...</p>
-                </div>
+                    <p>Đang tải...</p> </div>
             </div>
         </div>
     </div>
