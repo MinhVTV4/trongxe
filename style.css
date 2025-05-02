@@ -230,32 +230,22 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 #passenger-list .passenger-item:last-child { border-bottom: none; }
 
 /* Định nghĩa cột */
-.col-name, .col-contact, .col-pickup, .col-dropoff, .col-status, .col-actions { padding: 12px 10px; display: flex; align-items: center; word-break: break-word; border-right: 1px solid #e9ecef; transition: opacity 0.3s ease, font-weight 0.3s ease, display 0.3s ease, visibility 0.3s ease, font-size 0.2s ease, color 0.2s ease; /* Thêm transition */ }
+.col-name, .col-contact, .col-pickup, .col-dropoff, .col-status, .col-actions { padding: 12px 10px; display: flex; align-items: center; word-break: break-word; border-right: 1px solid #e9ecef; transition: opacity 0.3s ease, font-weight 0.3s ease, display 0.3s ease, visibility 0.3s ease, font-size 0.2s ease, color 0.2s ease; }
 .passenger-list-header div:last-child, .passenger-item > div:last-child { border-right: none; }
 
 /* Độ rộng cột */
 .col-name { flex: 1 1 180px; min-width: 150px; position: relative; padding-right: 30px; }
-/* === LÀM NỔI BẬT TÊN KHÁCH === */
-.col-name .passenger-main-name {
-    font-weight: 600; /* Đậm hơn */
-    font-size: 1.1em; /* To hơn chút */
-    color: #003f7e; /* Màu đậm hơn */
-    margin-right: 5px;
-    display: inline; /* Đảm bảo không xuống dòng */
-}
+.col-name .passenger-main-name { font-weight: 600; font-size: 1.1em; color: #003f7e; margin-right: 5px; display: inline; }
 .col-name .seat-count { font-weight: normal; font-size: 0.9em; color: #555; }
-/* ============================ */
 .col-contact { flex: 1 1 130px; min-width: 120px; }
-/* === LÀM NỔI BẬT ĐỊA CHỈ === */
-.col-pickup, .col-dropoff {
-    flex: 1 1 200px;
-    min-width: 170px;
-    font-size: 1.05em; /* To hơn chút */
-    color: #196a9f; /* Màu xanh đậm hơn */
-    font-weight: 500; /* Đậm hơn SĐT */
+.col-pickup, .col-dropoff { flex: 1 1 200px; min-width: 170px; font-size: 1.05em; color: #196a9f; font-weight: 500; }
+/* === CẬP NHẬT CỘT TRẠNG THÁI === */
+.col-status {
+    flex: 0 0 120px; /* Tăng độ rộng chút */
+    justify-content: center; /* Căn giữa theo chiều ngang */
+    align-items: center; /* Căn giữa theo chiều dọc (đã có) */
 }
-/* ========================= */
-.col-status { flex: 0 0 110px; justify-content: center; }
+/* ============================ */
 .col-actions { flex: 0 0 140px; flex-wrap: wrap; gap: 5px; justify-content: center; }
 
 /* Nội dung ô */
@@ -266,8 +256,19 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 .passenger-item .icon-phone { color: #28a745; }
 .passenger-item .icon-map { color: #dc3545; }
 
-/* Trạng thái khách */
-.passenger-status { font-weight: bold; padding: 4px 10px; border-radius: 15px; font-size: 0.9em; display: inline-block; text-align: center; min-width: 80px; color: white; }
+/* === CẬP NHẬT STYLE TRẠNG THÁI === */
+.passenger-status {
+    font-weight: bold;
+    padding: 5px 12px; /* Tăng padding */
+    border-radius: 16px; /* Bo tròn hơn */
+    font-size: 0.95em; /* To hơn chút */
+    display: inline-block;
+    text-align: center;
+    min-width: 90px; /* Tăng min-width */
+    color: white;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1); /* Thêm shadow nhẹ */
+}
+/* =============================== */
 .status-booked { background-color: #ffc107; color: #343a40; } .status-picked_up { background-color: #17a2b8; } .status-dropped_off { background-color: #28a745; } .status-cancelled { background-color: #6c757d; text-decoration: line-through;} .status-no_show { background-color: #dc3545; }
 
 /* Nút hành động khách */
@@ -280,24 +281,14 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 
 /* Style khi khách đã đón */
 .passenger-item.picked-up .col-contact,
-.passenger-item.picked-up .col-pickup {
-    opacity: 0;
-    pointer-events: none;
-}
-/* === LÀM NỔI BẬT ĐIỂM TRẢ KHI ĐÃ ĐÓN === */
-.passenger-item.picked-up .col-dropoff {
-    font-weight: 700; /* Đậm hơn nữa */
-    color: #003f7e; /* Màu đậm nhất */
-    font-size: 1.1em; /* To hơn nữa */
-}
-/* ==================================== */
+.passenger-item.picked-up .col-pickup { opacity: 0; pointer-events: none; }
+.passenger-item.picked-up .col-dropoff { font-weight: 700; color: #003f7e; font-size: 1.1em; }
 
 /* Style cho chế độ "Đang chạy" */
 .passenger-list-container.running-mode .passenger-item.status-cancelled,
 .passenger-list-container.running-mode .passenger-item.status-no_show { display: none; }
 .passenger-list-container.running-mode .passenger-item.picked-up .col-contact,
 .passenger-list-container.running-mode .passenger-item.picked-up .col-pickup { opacity: 0; pointer-events: none; }
-/* Áp dụng style đậm cho điểm trả khi đang chạy và đã đón */
 .passenger-list-container.running-mode .passenger-item.picked-up .col-dropoff { font-weight: 700; color: #003f7e; font-size: 1.1em; }
 .passenger-list-container.running-mode .col-status { display: none; }
 
@@ -358,10 +349,9 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 
     /* Thêm label */
     .passenger-item .col-name::before { content: "Tên (Số chỗ): "; font-weight: bold; margin-right: 5px; display: inline-block; width: 100px;}
-    /* Làm nổi bật Tên và Địa chỉ trên mobile */
-    .passenger-item .col-name .passenger-main-name { font-size: 1.15em; } /* Giữ nguyên */
-    .passenger-item .col-pickup, .passenger-item .col-dropoff { font-size: 1.1em; color: #196a9f; } /* Tăng cỡ chữ và đổi màu */
-    .passenger-item.picked-up .col-dropoff { font-weight: bold; color: #003f7e; font-size: 1.15em; } /* Đậm và to hơn khi đã đón */
+    .passenger-item .col-name .passenger-main-name { font-size: 1.15em; }
+    .passenger-item .col-pickup, .passenger-item .col-dropoff { font-size: 1.1em; color: #196a9f; }
+    .passenger-item.picked-up .col-dropoff { font-weight: bold; color: #003f7e; font-size: 1.15em; }
 
     .passenger-item .col-contact::before { content: "SĐT: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 100px;}
     .passenger-item .col-pickup::before { content: "Đón: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 100px;}
@@ -370,10 +360,15 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
     .passenger-item .col-actions { justify-content: center; padding-top: 15px; border-bottom: none;}
     .passenger-item .col-actions::before { display: none; }
 
-    .passenger-item .col-status .passenger-status { margin-left: 0px; }
+    /* Căn giữa trạng thái trên mobile nếu cột không bị ẩn */
+    .passenger-item .col-status { justify-content: flex-start; } /* Reset justify-content */
+    .passenger-item .col-status .passenger-status { margin-left: 105px; /* Khoảng cách bằng label + margin */ }
+    /* Ẩn label trạng thái trên mobile */
+    .passenger-item .col-status::before { display: none; }
+
+
 }
 
 
 /* Utility class */
 .hidden { display: none !important; }
-
