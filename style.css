@@ -96,23 +96,42 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;} /* Overr
 }
 #trip-detail-view h4 { margin-top: 1em; font-size: 1.1em;}
 
-#detail-trip-info, #detail-seat-info, #detail-trip-notes {
-    font-size: 1.05em;
-    margin-bottom: 10px;
+/* === Trip Summary Table Styling === */
+#trip-summary-table {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    margin-bottom: 25px; /* Khoảng cách với phần quản lý khách */
     background-color: #f8f9fa;
-    padding: 12px;
-    border-radius: 4px;
-    border-left: 4px solid #007bff;
+    padding: 10px 0; /* Padding trên dưới */
+    font-size: 1.05em;
 }
-#detail-trip-notes { font-style: italic; color: #555; border-left-color: #6c757d; }
+.summary-row {
+    display: flex;
+    padding: 8px 15px; /* Padding cho mỗi hàng */
+    border-bottom: 1px dashed #e9ecef; /* Đường kẻ ngang mờ */
+}
+#trip-summary-table .summary-row:last-child {
+    border-bottom: none; /* Bỏ đường kẻ cho hàng cuối */
+}
+.summary-label {
+    flex: 0 0 150px; /* Độ rộng cố định cho nhãn */
+    font-weight: 600;
+    color: #495057;
+}
+.summary-value {
+    flex: 1; /* Giá trị chiếm phần còn lại */
+    color: #212529;
+}
+.summary-value .seat-booked { color: red; font-weight: bold; }
+.summary-value .seat-available { color: green; font-weight: bold; }
+.summary-value .trip-notes-value { font-style: italic; color: #555;}
 
 /* === Add Passenger Form Toggle === */
 #add-passenger-toggle-area {
-    margin-bottom: 20px; /* Khoảng cách với phần dưới */
+    margin-bottom: 20px;
 }
 #show-add-passenger-form-btn {
-    /* Style đã có từ .action-button.manage-btn */
-    font-size: 1.05em; /* Nút to hơn chút */
+    font-size: 1.05em;
 }
 
 /* Form thêm khách */
@@ -124,7 +143,7 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;} /* Overr
     margin-bottom: 25px;
 }
 #add-passenger-form h4 {
-    margin-top: 0; /* Bỏ margin top cho tiêu đề trong form */
+    margin-top: 0;
     margin-bottom: 15px;
     padding-bottom: 10px;
     font-size: 1.2em;
@@ -133,67 +152,64 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;} /* Overr
 .form-actions {
     display: flex;
     gap: 15px;
-    justify-content: flex-end; /* Đẩy nút về bên phải */
+    justify-content: flex-end;
     margin-top: 10px;
 }
 #cancel-add-passenger-btn {
-    background-color: #6c757d; /* Màu xám */
+    background-color: #6c757d;
     color: white;
 }
 
 /* === Passenger List Table Styling === */
 .passenger-list-container {
     width: 100%;
-    overflow-x: auto; /* Cho phép cuộn ngang trên màn hình nhỏ */
+    overflow-x: auto;
     border: 1px solid #dee2e6;
     border-radius: 6px;
     background-color: #fff;
 }
 
 .passenger-list-header,
-.passenger-item { /* Áp dụng display: flex cho cả header và mỗi dòng item */
+.passenger-item {
     display: flex;
-    align-items: stretch; /* Các cột cao bằng nhau */
+    align-items: stretch;
     border-bottom: 1px solid #dee2e6;
-    padding: 0; /* Bỏ padding cũ của passenger-item */
+    padding: 0;
 }
 .passenger-list-header {
-    background-color: #f1f3f5; /* Nền xám nhẹ cho header */
+    background-color: #f1f3f5;
     font-weight: 600;
     color: #495057;
-    border-top-left-radius: 5px; /* Bo góc trên */
+    border-top-left-radius: 5px;
     border-top-right-radius: 5px;
-    border-bottom-width: 2px; /* Đường kẻ đậm hơn dưới header */
+    border-bottom-width: 2px;
 }
 #passenger-list .passenger-item:last-child {
-    border-bottom: none; /* Bỏ đường kẻ cho dòng cuối */
+    border-bottom: none;
 }
 
-/* Định nghĩa độ rộng và style cho từng cột */
 .col-stt, .col-name, .col-contact, .col-seats,
 .col-pickup, .col-dropoff, .col-status, .col-actions {
-    padding: 12px 10px; /* Padding bên trong mỗi ô */
+    padding: 12px 10px;
     display: flex;
-    align-items: center; /* Căn giữa nội dung theo chiều dọc */
-    word-break: break-word; /* Tự xuống dòng nếu cần */
-    border-right: 1px solid #e9ecef; /* Đường kẻ dọc giữa các cột */
+    align-items: center;
+    word-break: break-word;
+    border-right: 1px solid #e9ecef;
 }
 .passenger-list-header div:last-child,
 .passenger-item > div:last-child {
-    border-right: none; /* Bỏ đường kẻ cột cuối */
+    border-right: none;
 }
 
-/* Độ rộng cột (điều chỉnh tùy ý) */
 .col-stt { flex: 0 0 45px; justify-content: center; }
-.col-name { flex: 1 1 150px; min-width: 130px; } /* Linh hoạt, tối thiểu 130px */
+.col-name { flex: 1 1 150px; min-width: 130px; }
 .col-contact { flex: 1 1 120px; min-width: 110px; }
 .col-seats { flex: 0 0 60px; justify-content: center; text-align: center; }
 .col-pickup { flex: 1 1 180px; min-width: 150px; }
 .col-dropoff { flex: 1 1 180px; min-width: 150px; }
 .col-status { flex: 0 0 110px; justify-content: center; }
-.col-actions { flex: 0 0 180px; /* Đủ rộng cho các nút */ flex-wrap: wrap; gap: 5px; justify-content: center; }
+.col-actions { flex: 0 0 180px; flex-wrap: wrap; gap: 5px; justify-content: center; }
 
-/* Style cho nội dung bên trong các ô dữ liệu */
 .passenger-item .col-contact a,
 .passenger-item .col-pickup a,
 .passenger-item .col-dropoff a {
@@ -210,7 +226,6 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;} /* Overr
 .passenger-item .icon-phone { color: #28a745; }
 .passenger-item .icon-map { color: #dc3545; }
 
-/* Style cho trạng thái (giữ nguyên từ trước) */
 .passenger-status {
     font-weight: bold;
     padding: 4px 10px;
@@ -219,24 +234,23 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;} /* Overr
     display: inline-block;
     text-align: center;
     min-width: 80px;
-    color: white; /* Mặc định chữ trắng */
+    color: white;
 }
-.status-booked { background-color: #ffc107; color: #343a40; } /* Vàng */
-.status-picked_up { background-color: #17a2b8; } /* Xanh dương */
-.status-dropped_off { background-color: #28a745; } /* Xanh lá */
-.status-cancelled { background-color: #6c757d; text-decoration: line-through;} /* Xám */
-.status-no_show { background-color: #dc3545; } /* Đỏ */
+.status-booked { background-color: #ffc107; color: #343a40; }
+.status-picked_up { background-color: #17a2b8; }
+.status-dropped_off { background-color: #28a745; }
+.status-cancelled { background-color: #6c757d; text-decoration: line-through;}
+.status-no_show { background-color: #dc3545; }
 
-/* Style cho các nút hành động trong bảng */
 .passenger-item .col-actions .status-update-btn,
 .passenger-item .col-actions .delete-passenger-btn {
-    padding: 5px 8px; /* Nút nhỏ hơn trong bảng */
+    padding: 5px 8px;
     font-size: 0.85em;
     border-radius: 4px;
-    margin: 2px; /* Thêm margin nhỏ */
+    margin: 2px;
 }
 .passenger-item .col-actions .delete-passenger-btn {
-    background-color: #fd7e14; /* Cam */
+    background-color: #fd7e14;
 }
 .passenger-item .col-actions .delete-passenger-btn:hover {
      background-color: #e06200; filter: none;
@@ -244,12 +258,25 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;} /* Overr
 
 /* Responsive cho bảng trên màn hình nhỏ */
 @media (max-width: 768px) {
+    /* Responsive cho bảng tóm tắt chuyến đi */
+    .summary-row {
+        flex-direction: column; /* Chuyển thành cột */
+        align-items: flex-start; /* Căn trái */
+        padding: 10px 15px;
+    }
+    .summary-label {
+        flex-basis: auto; /* Reset flex-basis */
+        margin-bottom: 3px; /* Khoảng cách nhỏ giữa label và value */
+        color: #0056b3; /* Đổi màu label cho nổi bật */
+    }
+
+    /* Responsive cho bảng danh sách khách */
     .passenger-list-header {
-        display: none; /* Ẩn header trên màn hình nhỏ */
+        display: none;
     }
     .passenger-item {
-        flex-direction: column; /* Chuyển thành cột */
-        align-items: stretch; /* Căn đều theo chiều rộng */
+        flex-direction: column;
+        align-items: stretch;
         margin-bottom: 15px;
         border: 1px solid #ccc;
         border-radius: 6px;
@@ -257,29 +284,30 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;} /* Overr
     }
     .col-stt, .col-name, .col-contact, .col-seats,
     .col-pickup, .col-dropoff, .col-status, .col-actions {
-        flex-basis: auto; /* Reset flex-basis */
-        width: 100%; /* Chiếm toàn bộ chiều rộng */
-        border-right: none; /* Bỏ đường kẻ dọc */
-        border-bottom: 1px dashed #eee; /* Thêm đường kẻ ngang giữa các "ô" */
-        padding: 10px 15px; /* Điều chỉnh padding */
-        justify-content: flex-start; /* Căn trái nội dung */
-        text-align: left; /* Căn trái text */
+        flex-basis: auto;
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px dashed #eee;
+        padding: 10px 15px;
+        justify-content: flex-start;
+        text-align: left;
     }
     .passenger-item > div:last-child {
-        border-bottom: none; /* Bỏ đường kẻ cuối cùng */
+        border-bottom: none;
     }
     /* Thêm label cho từng ô dữ liệu */
-    .passenger-item .col-stt::before { content: "STT: "; font-weight: bold; margin-right: 5px; }
-    .passenger-item .col-name::before { content: "Tên: "; font-weight: bold; margin-right: 5px; }
-    .passenger-item .col-contact::before { content: "SĐT: "; font-weight: bold; margin-right: 5px; }
-    .passenger-item .col-seats::before { content: "Số chỗ: "; font-weight: bold; margin-right: 5px; }
-    .passenger-item .col-pickup::before { content: "Đón: "; font-weight: bold; margin-right: 5px; }
-    .passenger-item .col-dropoff::before { content: "Trả: "; font-weight: bold; margin-right: 5px; }
-    .passenger-item .col-status::before { content: "Trạng thái: "; font-weight: bold; margin-right: 5px; }
-    .passenger-item .col-actions { justify-content: center; padding-top: 15px; } /* Căn giữa các nút */
+    .passenger-item .col-stt::before { content: "STT: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 80px;}
+    .passenger-item .col-name::before { content: "Tên: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 80px;}
+    .passenger-item .col-contact::before { content: "SĐT: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 80px;}
+    .passenger-item .col-seats::before { content: "Số chỗ: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 80px;}
+    .passenger-item .col-pickup::before { content: "Đón: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 80px;}
+    .passenger-item .col-dropoff::before { content: "Trả: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 80px;}
+    .passenger-item .col-status::before { content: "Trạng thái: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 80px;}
+    .passenger-item .col-actions { justify-content: center; padding-top: 15px; border-bottom: none;} /* Bỏ border và căn giữa nút */
+    .passenger-item .col-actions::before { display: none; } /* Không cần label cho actions */
 
-    /* Điều chỉnh lại style cho trạng thái và nút trong layout dọc */
-    .passenger-item .col-status .passenger-status { margin-left: 5px; }
+
+    .passenger-item .col-status .passenger-status { margin-left: 0px; } /* Reset margin */
 }
 
 
