@@ -204,9 +204,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const passengerElement = document.createElement('div');
             passengerElement.classList.add('passenger-item');
 
-            const mapSearchBaseUrl = "https://www.google.com/maps/search/?api=1&query=URL_ENCODED_ADDRESS";
-            const mapLinkPickup = `${mapSearchBaseUrl}?api=1&query=${encodeURIComponent(passenger.pickupAddress)}`;
-            const mapLinkDropoff = `${mapSearchBaseUrl}?api=1&query=${encodeURIComponent(passenger.dropoffAddress)}`;
+            // === SỬA LỖI LINK GOOGLE MAPS (Lần 2) ===
+            // Sử dụng URL tìm kiếm chuẩn và ổn định nhất của Google Maps
+            const mapSearchUrl = "https://www.google.com/maps/search/?api=1&query=";
+            const mapLinkPickup = `${mapSearchUrl}${encodeURIComponent(passenger.pickupAddress)}`;
+            const mapLinkDropoff = `${mapSearchUrl}${encodeURIComponent(passenger.dropoffAddress)}`;
+            // =========================================
 
             const { statusText, statusClass } = getStatusInfo(passenger.status);
             const passengerIdentifier = `data-passenger-name="${passenger.name}" data-passenger-contact="${passenger.contact}"`;
