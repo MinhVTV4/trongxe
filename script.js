@@ -10,8 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Trip Detail View elements
     const backToListBtn = document.getElementById('back-to-list-btn');
     const detailTripTitle = document.getElementById('detail-trip-title');
-    // Target the new summary table container
-    const tripSummaryTableDiv = document.getElementById('trip-summary-table'); // <-- Mới
+    // Target the new compact summary container
+    const tripSummaryCompactDiv = document.getElementById('trip-summary-compact'); // <-- Mới
 
     // Passenger Management elements
     const addPassengerToggleArea = document.getElementById('add-passenger-toggle-area');
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const passengerListDiv = document.getElementById('passenger-list');
     const currentTripIdInput = document.getElementById('current-trip-id');
 
-    const STORAGE_KEY = 'xeGhepTrips_v5'; // Key for version 5
+    const STORAGE_KEY = 'xeGhepTrips_v6'; // Key for version 6
 
     // === Data Handling ===
     function getTrips() {
@@ -65,7 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo(0, 0);
     }
 
-    // --- CẬP NHẬT HÀM NÀY ---
     function showTripDetailView(tripId) {
         const trip = findTripById(tripId);
         if (!trip) {
@@ -77,22 +76,21 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update trip title
         detailTripTitle.textContent = `Chi tiết: ${trip.origin} → ${trip.destination}`;
 
-        // --- Tạo nội dung cho bảng tóm tắt chuyến đi ---
-        displayTripSummary(trip); // <-- Gọi hàm mới
+        // --- Tạo nội dung cho khu vực tóm tắt gọn ---
+        displayTripSummaryCompact(trip); // <-- Gọi hàm mới
 
-        // Display passenger list (table format)
+        // Display passenger list (table format - tinh gọn)
         displayPassengerList(trip.passengers, tripId);
 
         // Set current trip ID and reset/hide the add passenger form initially
         currentTripIdInput.value = tripId;
-        hideAddPassengerForm(); // Ensure form is hidden when view loads
+        hideAddPassengerForm();
 
         // Switch views
         tripListView.classList.add('hidden');
         tripDetailView.classList.remove('hidden');
         window.scrollTo(0, 0);
     }
-    // --- Kết thúc showTripDetailView ---
 
 
     function showAddPassengerForm() {
@@ -145,53 +143,45 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- HÀM MỚI: Hiển thị bảng tóm tắt chuyến đi ---
-    function displayTripSummary(trip) {
+    // --- HÀM MỚI: Hiển thị tóm tắt chuyến đi dạng gọn ---
+    function displayTripSummaryCompact(trip) {
         const bookedSeats = calculateBookedSeats(trip);
         const availableSeats = trip.vehicleSeats - bookedSeats;
 
+        // Sử dụng grid layout đã định nghĩa trong CSS
         let summaryHTML = `
-            <div class="summary-row">
-                <div class="summary-label">Ngày đi:</div>
-                <div class="summary-value">${formatDate(trip.date)} lúc ${trip.time}</div>
+            <div class="summary-item-label">Thời gian:</div>
+            <div class="summary-item-value">${formatDate(trip.date)} - ${trip.time}</div>
+
+            <div class="summary-item-label">Tình trạng chỗ:</div>
+            <div class="summary-item-value">
+                <span class="seat-booked">${bookedSeats}</span> / ${trip.vehicleSeats}
+                (<span class="seat-available">${availableSeats}</span> trống)
             </div>
-            <div class="summary-row">
-                <div class="summary-label">Loại xe:</div>
-                <div class="summary-value">${trip.vehicleSeats} chỗ</div>
-            </div>
-            <div class="summary-row">
-                <div class="summary-label">Giá / chỗ:</div>
-                <div class="summary-value">${formatCurrency(trip.pricePerSeat)}</div>
-            </div>
-            <div class="summary-row">
-                <div class="summary-label">Chỗ đã đặt:</div>
-                <div class="summary-value"><span class="seat-booked">${bookedSeats}</span> / ${trip.vehicleSeats}</div>
-            </div>
-             <div class="summary-row">
-                <div class="summary-label">Chỗ còn trống:</div>
-                <div class="summary-value"><span class="seat-available">${availableSeats}</span></div>
-            </div>
+
+            <div class="summary-item-label">Giá vé:</div>
+            <div class="summary-item-value">${formatCurrency(trip.pricePerSeat)} / chỗ</div>
         `;
 
         // Chỉ thêm hàng ghi chú nếu có
         if (trip.notes) {
             summaryHTML += `
-                <div class="summary-row">
-                    <div class="summary-label">Ghi chú CĐ:</div>
-                    <div class="summary-value"><span class="trip-notes-value">${trip.notes}</span></div>
-                </div>
+                <div class="summary-item-label">Ghi chú:</div>
+                <div class="summary-item-value"><span class="trip-notes-value">${trip.notes}</span></div>
             `;
         }
 
-        tripSummaryTableDiv.innerHTML = summaryHTML;
+        tripSummaryCompactDiv.innerHTML = summaryHTML;
     }
-    // --- Kết thúc displayTripSummary ---
+    // --- Kết thúc displayTripSummaryCompact ---
 
 
+    // --- CẬP NHẬT HÀM NÀY ĐỂ RENDER BẢNG TINH GỌN ---
     function displayPassengerList(passengers, tripId) {
         passengerListDiv.innerHTML = '';
         if (!passengers || passengers.length === 0) {
-            passengerListDiv.innerHTML = '<div class="passenger-item"><p style="text-align:center; width:100%; padding: 20px;">Chưa có hành khách nào cho chuyến này.</p></div>';
+            // Giữ nguyên thông báo nếu không có khách
+             passengerListDiv.innerHTML = '<div class="passenger-item" style="border:none; justify-content: center; padding: 20px;">Chưa có hành khách nào cho chuyến này.</div>';
             return;
         }
 
@@ -200,27 +190,27 @@ document.addEventListener('DOMContentLoaded', () => {
             return (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
         });
 
-        passengers.forEach((passenger, index) => {
+        passengers.forEach((passenger) => { // Không cần index nữa vì bỏ cột STT
             const passengerElement = document.createElement('div');
             passengerElement.classList.add('passenger-item');
 
-            // === SỬA LỖI LINK GOOGLE MAPS (Lần 2) ===
-            // Sử dụng URL tìm kiếm chuẩn và ổn định nhất của Google Maps
             const mapSearchUrl = "https://www.google.com/maps/search/?api=1&query=";
             const mapLinkPickup = `${mapSearchUrl}${encodeURIComponent(passenger.pickupAddress)}`;
             const mapLinkDropoff = `${mapSearchUrl}${encodeURIComponent(passenger.dropoffAddress)}`;
-            // =========================================
 
             const { statusText, statusClass } = getStatusInfo(passenger.status);
             const passengerIdentifier = `data-passenger-name="${passenger.name}" data-passenger-contact="${passenger.contact}"`;
 
+            // Tạo HTML cho các cột còn lại
             passengerElement.innerHTML = `
-                <div class="col-stt">${index + 1}</div>
-                <div class="col-name">${passenger.name} ${passenger.notes ? `<i style="font-size:0.8em; color: #6c757d;" title="${passenger.notes}"> (ghi chú)</i>` : ''}</div>
+                <div class="col-name">
+                    ${passenger.name}
+                    <span class="seat-count">(${passenger.seatsBooked} chỗ)</span>
+                    ${passenger.notes ? `<i style="font-size:0.8em; color: #6c757d; display:block; margin-top:3px;" title="${passenger.notes}">Ghi chú: ${passenger.notes}</i>` : ''}
+                </div>
                 <div class="col-contact">
                     <a href="tel:${passenger.contact}" title="Gọi ${passenger.name}"><span class="icon icon-phone">☎</span> ${passenger.contact}</a>
                 </div>
-                <div class="col-seats">${passenger.seatsBooked}</div>
                 <div class="col-pickup">
                     ${passenger.pickupAddress}
                     <a href="${mapLinkPickup}" target="_blank" title="Xem bản đồ điểm đón"><span class="icon icon-map">📍</span></a>
@@ -243,14 +233,13 @@ document.addEventListener('DOMContentLoaded', () => {
             passengerListDiv.appendChild(passengerElement);
         });
     }
+    // --- Kết thúc displayPassengerList ---
 
 
     // === Helper Functions ===
     function calculateBookedSeats(trip) {
         return trip.passengers.reduce((sum, p) => (p.status !== 'cancelled' && p.status !== 'no_show') ? sum + p.seatsBooked : sum, 0);
     }
-
-    // Bỏ hàm updateSeatInfo vì đã tích hợp vào displayTripSummary
 
     function formatCurrency(amount) {
         if (isNaN(amount)) return "N/A";
@@ -400,9 +389,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             trips[tripIndex].passengers.push(newPassenger);
             saveTrips(trips);
-            // Re-render passenger list and update summary table
+            // Re-render passenger list and update summary
             displayPassengerList(trips[tripIndex].passengers, tripId);
-            displayTripSummary(trips[tripIndex]); // <-- Cập nhật bảng tóm tắt
+            displayTripSummaryCompact(trips[tripIndex]); // <-- Cập nhật tóm tắt gọn
             hideAddPassengerForm();
         } else {
              alert('Lỗi: Không tìm thấy chuyến đi để cập nhật.');
@@ -432,12 +421,11 @@ document.addEventListener('DOMContentLoaded', () => {
              return;
          }
 
-         let needsSummaryUpdate = false; // Biến cờ để kiểm tra xem có cần cập nhật summary không
+         let needsSummaryUpdate = false;
 
          // Handle Delete Button
          if (target.classList.contains('delete-passenger-btn')) {
              if (confirm(`Bạn có chắc muốn xóa hành khách "${passengerName}" (${passengerContact})?`)) {
-                 // Chỉ cần cập nhật summary nếu khách bị xóa không phải là 'cancelled' hoặc 'no_show'
                  if (trips[tripIndex].passengers[passengerIndex].status !== 'cancelled' && trips[tripIndex].passengers[passengerIndex].status !== 'no_show') {
                      needsSummaryUpdate = true;
                  }
@@ -445,7 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  saveTrips(trips);
                  displayPassengerList(trips[tripIndex].passengers, tripId);
                  if (needsSummaryUpdate) {
-                     displayTripSummary(trips[tripIndex]); // Cập nhật summary nếu cần
+                     displayTripSummaryCompact(trips[tripIndex]); // <-- Cập nhật tóm tắt gọn
                  }
              }
          }
@@ -456,7 +444,6 @@ document.addEventListener('DOMContentLoaded', () => {
              const validStatuses = ['booked', 'picked_up', 'dropped_off', 'cancelled', 'no_show'];
 
              if (newStatus && validStatuses.includes(newStatus) && newStatus !== oldStatus) {
-                 // Cần cập nhật summary nếu trạng thái thay đổi từ/sang 'cancelled' hoặc 'no_show'
                  if ((oldStatus !== 'cancelled' && oldStatus !== 'no_show') !== (newStatus !== 'cancelled' && newStatus !== 'no_show')) {
                      needsSummaryUpdate = true;
                  }
@@ -464,7 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  saveTrips(trips);
                  displayPassengerList(trips[tripIndex].passengers, tripId);
                  if (needsSummaryUpdate) {
-                     displayTripSummary(trips[tripIndex]); // Cập nhật summary nếu cần
+                     displayTripSummaryCompact(trips[tripIndex]); // <-- Cập nhật tóm tắt gọn
                  }
              } else if (!newStatus || !validStatuses.includes(newStatus)) {
                  console.warn("Trạng thái mới không hợp lệ:", newStatus);
@@ -473,6 +460,6 @@ document.addEventListener('DOMContentLoaded', () => {
      });
 
     // === Initial Load ===
-    showTripListView(); // Show the main trip list view initially
+    showTripListView();
 
 }); // End DOMContentLoaded
