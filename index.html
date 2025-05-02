@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Xe Ghép v10</title> <link rel="stylesheet" href="style.css">
+    <title>Quản lý Xe Ghép v11</title> <link rel="stylesheet" href="style.css">
     </head>
 <body>
     <h1>Quản lý Chuyến Đi Xe Ghép</h1>
@@ -14,6 +14,7 @@
         </button>
         <span id="wake-lock-status" class="status-indicator"></span>
     </div>
+
     <div id="trip-list-view">
         <div class="card" id="add-trip-card">
              <div id="add-trip-toggle-area">
@@ -21,7 +22,6 @@
                      <span class="icon">➕</span> Tạo Chuyến Đi Mới
                  </button>
              </div>
-
             <form id="add-trip-form" class="hidden">
                  <h2><span class="icon">🚗</span> Nhập thông tin chuyến đi mới</h2>
                 <div class="form-row">
@@ -39,9 +39,11 @@
                  <textarea id="trip-notes" placeholder="Ghi chú cho chuyến đi (tùy chọn)..."></textarea>
                  <div class="form-actions">
                     <button type="submit">Lưu Chuyến Đi</button>
-                    <button type="button" id="cancel-add-trip-btn">Hủy</button> </div>
+                    <button type="button" id="cancel-add-trip-btn">Hủy</button>
+                 </div>
             </form>
         </div>
+
         <div class="card">
             <div class="view-toggle-controls">
                  <h2 id="trip-list-title"><span class="icon">📑</span> Chuyến đi Sắp tới / Đang chạy</h2>
@@ -53,7 +55,8 @@
         </div>
     </div>
 
-    <div id="trip-detail-view" class="hidden"> <button id="back-to-list-btn">← Quay lại Danh sách</button>
+    <div id="trip-detail-view" class="hidden">
+        <button id="back-to-list-btn">← Quay lại Danh sách</button>
         <div class="card">
             <h2 id="detail-trip-title">Chi tiết chuyến đi</h2>
             <div id="trip-summary-compact">
@@ -62,12 +65,33 @@
 
             <div id="trip-action-buttons" class="trip-detail-actions">
                 </div>
-            <h3><span class="icon">👥</span> Quản lý Hành Khách</h3>
 
+             <div id="edit-trip-form-container" class="hidden">
+                 <form id="edit-trip-form">
+                     <h4><span class="icon">✏️</span> Chỉnh sửa thông tin chuyến đi</h4>
+                     <input type="hidden" id="edit-trip-id"> <div class="form-row">
+                         <input type="text" id="edit-trip-origin" placeholder="Điểm đi" required>
+                         <input type="text" id="edit-trip-destination" placeholder="Điểm đến" required>
+                     </div>
+                     <div class="form-row">
+                         <input type="date" id="edit-trip-date" required title="Ngày đi">
+                         <input type="time" id="edit-trip-time" required title="Giờ đi">
+                     </div>
+                     <div class="form-row">
+                         <input type="number" id="edit-vehicle-seats" placeholder="Số chỗ xe" required min="1">
+                         <input type="number" id="edit-price-per-seat" placeholder="Giá/chỗ (VNĐ)" required min="0">
+                     </div>
+                      <textarea id="edit-trip-notes" placeholder="Ghi chú cho chuyến đi..."></textarea>
+                      <div class="form-actions">
+                         <button type="submit">Lưu Thay Đổi</button>
+                         <button type="button" id="cancel-edit-trip-btn">Hủy Sửa</button>
+                      </div>
+                 </form>
+             </div>
+             <h3><span class="icon">👥</span> Quản lý Hành Khách</h3>
              <div id="add-passenger-toggle-area">
                  <button id="show-add-passenger-form-btn" class="action-button manage-btn"><span class="icon">➕</span> Thêm khách mới</button>
              </div>
-
              <form id="add-passenger-form" class="hidden">
                  <h4>Nhập thông tin khách mới:</h4>
                  <input type="hidden" id="current-trip-id">
@@ -116,6 +140,7 @@
             <p id="restore-status" class="status-indicator"></p>
         </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
