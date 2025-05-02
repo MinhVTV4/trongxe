@@ -104,7 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
         addPassengerToggleArea.classList.add('hidden'); // Hide the "Add New" button area
         addPassengerForm.classList.remove('hidden'); // Show the form
         addPassengerForm.reset(); // Clear any previous input
-        // Optionally focus the first input field
         addPassengerForm.querySelector('input[type="text"]')?.focus();
     }
 
@@ -152,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- CẬP NHẬT HÀM NÀY ĐỂ RENDER BẢNG ---
+    // --- CẬP NHẬT HÀM NÀY ĐỂ RENDER BẢNG VÀ SỬA LINK MAPS ---
     function displayPassengerList(passengers, tripId) {
         passengerListDiv.innerHTML = ''; // Clear previous list content
         if (!passengers || passengers.length === 0) {
@@ -170,11 +169,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const passengerElement = document.createElement('div');
             passengerElement.classList.add('passenger-item'); // This is now a row in the table
 
-            const mapBaseUrl = "https://www.google.com/maps/search/?api=1&query=URL_ENCODED_ADDRESS";
-            const mapLinkPickup = `${mapBaseUrl}?api=1&query=${encodeURIComponent(passenger.pickupAddress)}`;
-            const mapLinkDropoff = `${mapBaseUrl}?api=1&query=${encodeURIComponent(passenger.dropoffAddress)}`;
+            // === SỬA LỖI LINK GOOGLE MAPS ===
+            // Sử dụng URL tìm kiếm chuẩn của Google Maps
+            const mapSearchBaseUrl = "https://www.google.com/maps/search/";
+            const mapLinkPickup = `${mapSearchBaseUrl}?api=1&query=${encodeURIComponent(passenger.pickupAddress)}`;
+            const mapLinkDropoff = `${mapSearchBaseUrl}?api=1&query=${encodeURIComponent(passenger.dropoffAddress)}`;
+            // ==================================
 
             const { statusText, statusClass } = getStatusInfo(passenger.status);
+            // Sử dụng name + contact làm định danh để xóa/cập nhật
             const passengerIdentifier = `data-passenger-name="${passenger.name}" data-passenger-contact="${passenger.contact}"`;
 
             // Create divs for each column matching the header structure
@@ -215,13 +218,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return trip.passengers.reduce((sum, p) => (p.status !== 'cancelled' && p.status !== 'no_show') ? sum + p.seatsBooked : sum, 0);
     }
 
-    // Function to update the seat info display separately
     function updateSeatInfo(trip) {
          const bookedSeats = calculateBookedSeats(trip);
          const availableSeats = trip.vehicleSeats - bookedSeats;
          detailSeatInfo.innerHTML = `<strong>Chỗ ngồi:</strong> <span style="color: red; font-weight: bold;">${bookedSeats}</span> / ${trip.vehicleSeats} (Còn trống: <span style="color: green; font-weight: bold;">${availableSeats}</span>)`;
     }
-
 
     function formatCurrency(amount) {
         if (isNaN(amount)) return "N/A";
@@ -314,13 +315,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // 3. Back to List from Detail View
     backToListBtn.addEventListener('click', showTripListView);
 
-    // --- CẬP NHẬT EVENT LISTENERS CHO FORM THÊM KHÁCH ---
     // 4. Show Add Passenger Form
     showAddPassengerFormBtn.addEventListener('click', showAddPassengerForm);
 
     // 5. Cancel Adding Passenger
     cancelAddPassengerBtn.addEventListener('click', (event) => {
-        event.preventDefault(); // Prevent potential form submission if type was submit
+        event.preventDefault();
         hideAddPassengerForm();
     });
 
@@ -365,7 +365,6 @@ document.addEventListener('DOMContentLoaded', () => {
              const existingPassenger = trips[tripIndex].passengers.find(p => p.name === newPassenger.name && p.contact === newPassenger.contact && p.status !== 'cancelled');
              if (existingPassenger) {
                  if (!confirm(`Khách hàng "${newPassenger.name}" (${newPassenger.contact}) đã tồn tại trong chuyến này và chưa bị hủy. Bạn vẫn muốn thêm lượt đặt mới?`)){
-                     // Không thêm, chỉ ẩn form đi
                      hideAddPassengerForm();
                      return;
                  }
@@ -373,21 +372,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
             trips[tripIndex].passengers.push(newPassenger);
             saveTrips(trips);
-            // Re-render passenger list and update seat info
             displayPassengerList(trips[tripIndex].passengers, tripId);
             updateSeatInfo(trips[tripIndex]);
-            // Hide the form after successful addition
             hideAddPassengerForm();
         } else {
              alert('Lỗi: Không tìm thấy chuyến đi để cập nhật.');
         }
     });
-    // --- KẾT THÚC EVENT LISTENERS FORM THÊM KHÁCH ---
 
 
      // 7. Click on Passenger List (Update Status / Delete Passenger)
      passengerListDiv.addEventListener('click', (event) => {
-         const target = event.target.closest('button'); // Find the closest button clicked
+         const target = event.target.closest('button');
          if (!target) return;
 
          const tripId = target.dataset.tripId;
@@ -400,11 +396,10 @@ document.addEventListener('DOMContentLoaded', () => {
          const tripIndex = trips.findIndex(t => t.id === tripId);
          if (tripIndex === -1) { console.error("Lỗi: Không tìm thấy chuyến đi."); return; }
 
-         // Find the correct passenger index in the original array
          const passengerIndex = trips[tripIndex].passengers.findIndex(p => p.name === passengerName && p.contact === passengerContact);
          if (passengerIndex === -1) {
              console.warn("Cảnh báo: Không tìm thấy hành khách với tên và SĐT này.");
-             showTripDetailView(tripId); // Refresh view to sync
+             showTripDetailView(tripId);
              return;
          }
 
@@ -413,7 +408,6 @@ document.addEventListener('DOMContentLoaded', () => {
              if (confirm(`Bạn có chắc muốn xóa hành khách "${passengerName}" (${passengerContact})?`)) {
                  trips[tripIndex].passengers.splice(passengerIndex, 1);
                  saveTrips(trips);
-                 // Re-render list and update seat info
                  displayPassengerList(trips[tripIndex].passengers, tripId);
                  updateSeatInfo(trips[tripIndex]);
              }
@@ -425,7 +419,6 @@ document.addEventListener('DOMContentLoaded', () => {
              if (newStatus && validStatuses.includes(newStatus)) {
                  trips[tripIndex].passengers[passengerIndex].status = newStatus;
                  saveTrips(trips);
-                  // Re-render list and update seat info
                  displayPassengerList(trips[tripIndex].passengers, tripId);
                  updateSeatInfo(trips[tripIndex]);
              } else {
