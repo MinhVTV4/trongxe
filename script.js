@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const seatStatusColor = availableSeats <= 0 ? 'red' : (availableSeats < trip.vehicleSeats ? '#e08100' : 'green'); // Đỏ: hết chỗ, Cam: còn ít, Xanh: còn nhiều
 
             tripElement.innerHTML = `
-                <h3>${trip.origin} &rarr; ${trip.destination}</h3>
+                <h3>${trip.origin} → ${trip.destination}</h3>
                 <p><strong>Ngày:</strong> ${formatDate(trip.date)} lúc ${trip.time}</p>
                 <p><strong>Xe:</strong> ${trip.vehicleSeats} chỗ - <strong>Giá:</strong> ${formatCurrency(trip.pricePerSeat)}/chỗ</p>
                 <p><strong>Chỗ:</strong> <span style="color: red; font-weight: bold;">${bookedSeats}</span> / ${trip.vehicleSeats}
@@ -138,7 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // === CẬP NHẬT HÀM NÀY ===
     function displayPassengerList(passengers, tripId) {
         passengerListDiv.innerHTML = ''; // Xóa danh sách cũ
         if (!passengers || passengers.length === 0) {
@@ -156,27 +155,24 @@ document.addEventListener('DOMContentLoaded', () => {
         passengers.forEach((passenger, index) => {
             const passengerElement = document.createElement('div');
             passengerElement.classList.add('passenger-item');
-            // Dùng index MỚI sau khi sắp xếp để đảm bảo xóa đúng
-            // Ta cần tìm index gốc trong mảng chưa sắp xếp để xóa cho đúng
-            // Hoặc đơn giản hơn là gán ID duy nhất cho mỗi passenger khi tạo ra
-
-            // Gán index hiện tại (sau khi sắp xếp) để tham chiếu DOM nếu cần, nhưng dùng ID để xóa/cập nhật data
-            // passengerElement.dataset.passengerIndex = index; // Index này chỉ dùng cho DOM
 
             // Tạo link Google Maps (cần encode địa chỉ)
-            // Lưu ý: Google Maps link có thể cần điều chỉnh tùy theo quốc gia và loại tìm kiếm mong muốn
-            const mapBaseUrl = "https://www.google.com/maps/search/?api=1&query=URL_ENCODED_ADDRESS";
-            const mapLinkPickup = `${mapBaseUrl}?q=${encodeURIComponent(passenger.pickupAddress)}`;
-            const mapLinkDropoff = `${mapBaseUrl}?q=${encodeURIComponent(passenger.dropoffAddress)}`;
+            const mapBaseUrl = "https://www.google.com/maps/search/"; // Sử dụng URL search của Google Maps
+            const mapLinkPickup = `${mapBaseUrl}?api=1&query=${encodeURIComponent(passenger.pickupAddress)}`;
+            const mapLinkDropoff = `${mapBaseUrl}?api=1&query=${encodeURIComponent(passenger.dropoffAddress)}`;
 
 
             // Lấy text và class cho trạng thái
             const { statusText, statusClass } = getStatusInfo(passenger.status);
 
+            // Sử dụng name + contact làm định danh để xóa/cập nhật
+            const passengerIdentifier = `data-passenger-name="${passenger.name}" data-passenger-contact="${passenger.contact}"`;
+
             passengerElement.innerHTML = `
                 <div class="passenger-header">
                     <h4>${index + 1}. ${passenger.name} <span style="font-weight:normal; color:#555;">(${passenger.seatsBooked} chỗ)</span></h4>
-                     <button class="delete-passenger-btn" title="Xóa khách này" data-trip-id="${tripId}" data-passenger-name="${passenger.name}" data-passenger-contact="${passenger.contact}">Xóa</button> </div>
+                     <button class="delete-passenger-btn" title="Xóa khách này" data-trip-id="${tripId}" ${passengerIdentifier}>Xóa</button>
+                </div>
 
                 <div class="passenger-details">
                     <p><strong>SĐT:</strong> <a href="tel:${passenger.contact}" title="Gọi ${passenger.name}"><span class="icon icon-phone">☎</span> ${passenger.contact}</a></p>
@@ -188,10 +184,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${passenger.notes ? `<div class="passenger-notes"><strong>Ghi chú:</strong> ${passenger.notes}</div>` : ''}
 
                 <div class="passenger-actions">
-                    ${passenger.status === 'booked' ? `<button class="status-update-btn btn-pickup" data-trip-id="${tripId}" data-passenger-name="${passenger.name}" data-passenger-contact="${passenger.contact}" data-new-status="picked_up">Đã Đón</button>` : ''}
-                    ${passenger.status === 'picked_up' ? `<button class="status-update-btn btn-dropoff" data-trip-id="${tripId}" data-passenger-name="${passenger.name}" data-passenger-contact="${passenger.contact}" data-new-status="dropped_off">Đã Trả</button>` : ''}
-                    ${passenger.status !== 'dropped_off' && passenger.status !== 'cancelled' ? `<button class="status-update-btn btn-cancel" data-trip-id="${tripId}" data-passenger-name="${passenger.name}" data-passenger-contact="${passenger.contact}" data-new-status="cancelled">Hủy chỗ</button>` : ''}
-                    ${passenger.status === 'booked' || passenger.status === 'picked_up' ? `<button class="status-update-btn btn-noshow" data-trip-id="${tripId}" data-passenger-name="${passenger.name}" data-passenger-contact="${passenger.contact}" data-new-status="no_show">Không đến</button>` : ''}
+                    ${passenger.status === 'booked' ? `<button class="status-update-btn btn-pickup" data-trip-id="${tripId}" ${passengerIdentifier} data-new-status="picked_up">Đã Đón</button>` : ''}
+                    ${passenger.status === 'picked_up' ? `<button class="status-update-btn btn-dropoff" data-trip-id="${tripId}" ${passengerIdentifier} data-new-status="dropped_off">Đã Trả</button>` : ''}
+                    ${passenger.status !== 'dropped_off' && passenger.status !== 'cancelled' ? `<button class="status-update-btn btn-cancel" data-trip-id="${tripId}" ${passengerIdentifier} data-new-status="cancelled">Hủy chỗ</button>` : ''}
+                    ${passenger.status === 'booked' || passenger.status === 'picked_up' ? `<button class="status-update-btn btn-noshow" data-trip-id="${tripId}" ${passengerIdentifier} data-new-status="no_show">Không đến</button>` : ''}
                  </div>
             `;
             passengerListDiv.appendChild(passengerElement);
@@ -200,8 +196,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // === Helper Functions ===
     function calculateBookedSeats(trip) {
-         // Chỉ tính các chỗ của khách chưa bị hủy
-        return trip.passengers.reduce((sum, p) => p.status !== 'cancelled' ? sum + p.seatsBooked : sum, 0);
+         // Chỉ tính các chỗ của khách chưa bị hủy hoặc không đến
+        return trip.passengers.reduce((sum, p) => (p.status !== 'cancelled' && p.status !== 'no_show') ? sum + p.seatsBooked : sum, 0);
     }
 
     function formatCurrency(amount) {
@@ -214,15 +210,20 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const [year, month, day] = dateString.split('-');
             // Kiểm tra xem có phải là ngày hợp lệ không
-            if (!year || !month || !day) throw new Error("Invalid date format");
+            if (!year || !month || !day || year.length !== 4 || month.length !== 2 || day.length !== 2) {
+                 throw new Error("Invalid date format (YYYY-MM-DD expected)");
+            }
              const date = new Date(year, month - 1, day); // month is 0-indexed
-             if (isNaN(date.getTime())) throw new Error("Invalid date value");
+             // Kiểm tra thêm tính hợp lệ của ngày tháng (ví dụ không có ngày 31/02)
+             if (isNaN(date.getTime()) || date.getFullYear() !== parseInt(year) || date.getMonth() !== parseInt(month) - 1 || date.getDate() !== parseInt(day)) {
+                 throw new Error("Invalid date value");
+             }
             return `${day}/${month}/${year}`;
         } catch (e) {
             console.error("Lỗi định dạng ngày:", dateString, e);
             return dateString; // Trả về chuỗi gốc nếu lỗi
         }
-    }
+    } // <<<--- DẤU } BỊ THIẾU Ở ĐÂY TRONG PHIÊN BẢN TRƯỚC
 
     // Hàm lấy text và class CSS cho trạng thái
     function getStatusInfo(status) {
@@ -253,10 +254,17 @@ document.addEventListener('DOMContentLoaded', () => {
             passengers: []
         };
 
-        if (!newTrip.origin || !newTrip.destination || !newTrip.date || !newTrip.time || isNaN(newTrip.vehicleSeats) || newTrip.vehicleSeats <= 0 || isNaN(newTrip.pricePerSeat)) {
+        // Kiểm tra ngày hợp lệ trước khi thêm
+        if (!newTrip.date || formatDate(newTrip.date) === newTrip.date) { // Nếu formatDate trả về chuỗi gốc tức là có lỗi
+             alert('Ngày đi không hợp lệ. Vui lòng chọn lại.');
+             return;
+        }
+
+        if (!newTrip.origin || !newTrip.destination || !newTrip.time || isNaN(newTrip.vehicleSeats) || newTrip.vehicleSeats <= 0 || isNaN(newTrip.pricePerSeat)) {
             alert('Vui lòng nhập đầy đủ thông tin hợp lệ cho chuyến đi.');
             return;
         }
+
 
         const trips = getTrips();
         trips.push(newTrip);
@@ -331,10 +339,11 @@ document.addEventListener('DOMContentLoaded', () => {
         let trips = getTrips();
         const tripIndex = trips.findIndex(t => t.id === tripId);
         if (tripIndex > -1) {
-             // Kiểm tra xem khách đã tồn tại chưa (dựa trên tên và sđt) để tránh trùng lặp
+             // Kiểm tra xem khách đã tồn tại chưa (dựa trên tên và sđt và chưa bị hủy) để tránh trùng lặp
              const existingPassenger = trips[tripIndex].passengers.find(p => p.name === newPassenger.name && p.contact === newPassenger.contact && p.status !== 'cancelled');
              if (existingPassenger) {
-                 if (!confirm(`Khách hàng "${newPassenger.name}" (${newPassenger.contact}) đã tồn tại trong chuyến này. Bạn vẫn muốn thêm lượt đặt mới?`)){
+                 if (!confirm(`Khách hàng "${newPassenger.name}" (${newPassenger.contact}) đã tồn tại trong chuyến này và chưa bị hủy. Bạn vẫn muốn thêm lượt đặt mới?`)){
+                     addPassengerForm.reset(); // Reset form nếu không thêm
                      return; // Hủy nếu không muốn thêm trùng
                  }
              }
@@ -358,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
          const passengerName = target.dataset.passengerName;
          const passengerContact = target.dataset.passengerContact;
 
-         if (!tripId || !passengerName || !passengerContact) return; // Cần đủ thông tin để xác định
+         if (!tripId || !passengerName || passengerContact === undefined) return; // Cần đủ thông tin để xác định (contact có thể rỗng nhưng phải tồn tại)
 
          let trips = getTrips();
          const tripIndex = trips.findIndex(t => t.id === tripId);
@@ -368,12 +377,16 @@ document.addEventListener('DOMContentLoaded', () => {
              return;
          }
          // Tìm index của khách hàng trong mảng gốc dựa trên name và contact
+         // Cần tìm *chính xác* khách hàng đó, vì có thể có nhiều khách trùng tên/sđt nhưng ở trạng thái khác nhau
+         // Cách tốt nhất là tìm index của phần tử DOM mà nút đó thuộc về, nhưng làm vậy hơi phức tạp
+         // Tạm thời vẫn dùng name+contact, nhưng cần lưu ý nếu có khách trùng tên+sđt thì có thể nhầm lẫn
+         // -> Giải pháp tốt hơn là gán ID duy nhất cho mỗi passenger khi tạo.
          const passengerIndex = trips[tripIndex].passengers.findIndex(p => p.name === passengerName && p.contact === passengerContact);
 
          if (passengerIndex === -1) {
-             console.error("Lỗi: Không tìm thấy hành khách với tên và SĐT này.");
-             // Có thể thông báo cho người dùng hoặc thử tìm cách khác
-             // Trong trường hợp đơn giản, ta bỏ qua
+             console.warn("Cảnh báo: Không tìm thấy hành khách với tên và SĐT này để thực hiện hành động. Có thể khách đã bị xóa hoặc thông tin không khớp.");
+             // Cập nhật lại giao diện để đảm bảo đồng bộ
+             showTripDetailView(tripId);
              return;
          }
 
