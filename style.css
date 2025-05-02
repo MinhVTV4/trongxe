@@ -110,35 +110,14 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 .action-button.manage-btn { background-color: #28a745; color: white; }
 .action-button.delete-btn { background-color: #dc3545; color: white; }
 
-/* === Add Trip Form Toggle (Mới) === */
-#add-trip-card {
-    /* Có thể thêm style riêng cho card này nếu cần */
-}
-#add-trip-toggle-area {
-    text-align: center; /* Căn giữa nút */
-    padding: 10px 0; /* Thêm padding */
-}
-#show-add-trip-form-btn {
-    /* Kế thừa style từ .action-button.manage-btn */
-    padding: 12px 25px; /* Nút to hơn */
-    font-size: 1.1em;
-}
-#add-trip-form {
-    /* Style cho form khi hiện ra (có thể giữ nguyên hoặc thêm) */
-    border-top: 1px solid #eee; /* Thêm đường kẻ phân cách */
-    padding-top: 20px;
-    margin-top: 15px;
-}
-#add-trip-form h2 {
-     margin-top: 0; /* Bỏ margin top cho tiêu đề trong form */
-     text-align: center;
-     margin-bottom: 20px;
-}
-#cancel-add-trip-btn { /* Nút hủy trong form thêm chuyến */
-    background-color: #6c757d;
-    color: white;
-}
-/* =============================== */
+/* Add Trip Form Toggle */
+#add-trip-card { }
+#add-trip-toggle-area { text-align: center; padding: 10px 0; }
+#show-add-trip-form-btn { padding: 12px 25px; font-size: 1.1em; }
+#add-trip-form { border-top: 1px solid #eee; padding-top: 20px; margin-top: 15px; }
+#add-trip-form h2 { margin-top: 0; text-align: center; margin-bottom: 20px; }
+#cancel-add-trip-btn { background-color: #6c757d; color: white; }
+
 
 /* View Toggle Controls */
 .view-toggle-controls {
@@ -149,15 +128,9 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
     padding-bottom: 10px;
     border-bottom: 1px solid #eee;
 }
-.view-toggle-controls h2 {
-    margin-bottom: 0;
-}
-#view-mode-toggle-btn {
-    background-color: #6f42c1;
-    color: white;
-    padding: 8px 15px;
-    font-size: 0.9em;
-}
+.view-toggle-controls h2 { margin-bottom: 0; }
+#view-mode-toggle-btn { background-color: #6f42c1; color: white; padding: 8px 15px; font-size: 0.9em; }
+
 
 /* Trip Detail View */
 #trip-detail-view h3, #trip-detail-view h4 {
@@ -181,16 +154,8 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
     gap: 8px 15px;
     font-size: 1.05em;
 }
-.summary-item-label {
-    font-weight: 600;
-    color: #495057;
-    grid-column: 1 / 2;
-    text-align: right;
-}
-.summary-item-value {
-    grid-column: 2 / 3;
-    color: #212529;
-}
+.summary-item-label { font-weight: 600; color: #495057; grid-column: 1 / 2; text-align: right; }
+.summary-item-value { grid-column: 2 / 3; color: #212529; }
 .summary-item-value .seat-booked { color: red; font-weight: bold; }
 .summary-item-value .seat-available { color: green; font-weight: bold; }
 .summary-item-value .trip-notes-value { font-style: italic; color: #555;}
@@ -198,6 +163,7 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 /* Trip Detail Actions Styling */
 .trip-detail-actions {
     display: flex;
+    flex-wrap: wrap; /* Cho phép xuống dòng nếu nhiều nút */
     gap: 10px;
     margin-bottom: 25px;
     padding-top: 15px;
@@ -207,94 +173,54 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 .start-trip-btn { background-color: #007bff; color: white; }
 .end-trip-btn { background-color: #28a745; color: white; }
 .cancel-trip-btn { background-color: #dc3545; color: white; }
+/* === Style cho nút Sửa và Sao chép === */
+.edit-trip-btn { background-color: #ffc107; color: #343a40; } /* Vàng */
+.copy-trip-btn { background-color: #17a2b8; color: white; } /* Xanh lam */
+/* ================================== */
 
-
-/* Add Passenger Form Toggle */
-#add-passenger-toggle-area {
-    margin-bottom: 20px;
-}
-#show-add-passenger-form-btn {
-    font-size: 1.05em;
-}
-
-/* Form thêm khách */
-#add-passenger-form {
-    border: 1px solid #ddd;
+/* === Edit Trip Form Styling (Mới) === */
+#edit-trip-form-container {
+    border: 1px solid #ffc107; /* Viền vàng để phân biệt */
     padding: 20px;
     border-radius: 6px;
-    background-color: #f8f9fa;
+    background-color: #fffcf2; /* Nền vàng nhạt */
+    margin-top: 20px; /* Khoảng cách với nút hành động */
     margin-bottom: 25px;
 }
-#add-passenger-form h4 {
+#edit-trip-form h4 {
     margin-top: 0;
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    font-size: 1.2em;
-    border-bottom: 1px solid #eee;
+    color: #856404; /* Màu chữ vàng đậm */
+    border-bottom-color: #ffeeba; /* Đường kẻ vàng nhạt */
 }
-.form-actions {
-    display: flex;
-    gap: 15px;
-    justify-content: flex-end;
-    margin-top: 10px;
-}
-#cancel-add-passenger-btn {
+#cancel-edit-trip-btn { /* Nút hủy trong form sửa */
     background-color: #6c757d;
     color: white;
 }
+/* ================================== */
 
-/* Passenger List Table Styling (Giai đoạn 1) */
-.passenger-list-container {
-    width: 100%;
-    overflow-x: auto;
-    border: 1px solid #dee2e6;
-    border-radius: 6px;
-    background-color: #fff;
-}
 
-.passenger-list-header,
-.passenger-item {
-    display: flex;
-    align-items: stretch;
-    border-bottom: 1px solid #dee2e6;
-    padding: 0;
-    position: relative;
-}
-.passenger-list-header {
-    background-color: #e9ecef;
-    font-weight: 600;
-    color: #495057;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    border-bottom-width: 2px;
-}
-#passenger-list .passenger-item:last-child {
-    border-bottom: none;
-}
+/* Add Passenger Form Toggle */
+#add-passenger-toggle-area { margin-bottom: 20px; }
+#show-add-passenger-form-btn { font-size: 1.05em; }
 
-/* Định nghĩa độ rộng và style cho từng cột */
-.col-name, .col-contact,
-.col-pickup, .col-dropoff, .col-status, .col-actions {
-    padding: 12px 10px;
-    display: flex;
-    align-items: center;
-    word-break: break-word;
-    border-right: 1px solid #e9ecef;
-    transition: opacity 0.3s ease, font-weight 0.3s ease, display 0s ease 0.3s;
-}
-.passenger-list-header div:last-child,
-.passenger-item > div:last-child {
-    border-right: none;
-}
+/* Form thêm khách */
+#add-passenger-form { border: 1px solid #ddd; padding: 20px; border-radius: 6px; background-color: #f8f9fa; margin-bottom: 25px; }
+#add-passenger-form h4 { margin-top: 0; margin-bottom: 15px; padding-bottom: 10px; font-size: 1.2em; border-bottom: 1px solid #eee; }
+.form-actions { display: flex; gap: 15px; justify-content: flex-end; margin-top: 10px; }
+#cancel-add-passenger-btn { background-color: #6c757d; color: white; }
+
+/* Passenger List Table Styling */
+.passenger-list-container { width: 100%; overflow-x: auto; border: 1px solid #dee2e6; border-radius: 6px; background-color: #fff; }
+.passenger-list-header, .passenger-item { display: flex; align-items: stretch; border-bottom: 1px solid #dee2e6; padding: 0; position: relative; }
+.passenger-list-header { background-color: #e9ecef; font-weight: 600; color: #495057; border-top-left-radius: 5px; border-top-right-radius: 5px; border-bottom-width: 2px; }
+#passenger-list .passenger-item:last-child { border-bottom: none; }
+
+/* Định nghĩa cột */
+.col-name, .col-contact, .col-pickup, .col-dropoff, .col-status, .col-actions { padding: 12px 10px; display: flex; align-items: center; word-break: break-word; border-right: 1px solid #e9ecef; transition: opacity 0.3s ease, font-weight 0.3s ease, display 0s ease 0.3s; }
+.passenger-list-header div:last-child, .passenger-item > div:last-child { border-right: none; }
 
 /* Độ rộng cột */
-.col-name {
-    flex: 1 1 180px;
-    min-width: 150px;
-    font-weight: 500;
-    position: relative;
-    padding-right: 30px;
-}
+.col-name { flex: 1 1 180px; min-width: 150px; font-weight: 500; position: relative; padding-right: 30px; }
 .col-name .seat-count { font-weight: normal; font-size: 0.9em; color: #555; margin-left: 5px;}
 .col-contact { flex: 1 1 130px; min-width: 120px; }
 .col-pickup { flex: 1 1 200px; min-width: 170px; }
@@ -302,136 +228,49 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 .col-status { flex: 0 0 110px; justify-content: center; }
 .col-actions { flex: 0 0 140px; flex-wrap: wrap; gap: 5px; justify-content: center; }
 
-/* Style cho nội dung bên trong các ô dữ liệu */
-.passenger-item .col-name i {
-     font-size: 0.85em; color: #6c757d; display: block; margin-top: 4px; font-style: normal;
-     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-
-.passenger-item .col-contact a,
-.passenger-item .col-pickup a,
-.passenger-item .col-dropoff a {
-    color: #007bff;
-    text-decoration: none;
-    margin-left: 4px;
-}
-.passenger-item .col-contact a:hover,
-.passenger-item .col-pickup a:hover,
-.passenger-item .col-dropoff a:hover {
-    text-decoration: underline;
-}
+/* Nội dung ô */
+.passenger-item .col-name i { font-size: 0.85em; color: #6c757d; display: block; margin-top: 4px; font-style: normal; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.passenger-item .col-contact a, .passenger-item .col-pickup a, .passenger-item .col-dropoff a { color: #007bff; text-decoration: none; margin-left: 4px; }
+.passenger-item .col-contact a:hover, .passenger-item .col-pickup a:hover, .passenger-item .col-dropoff a:hover { text-decoration: underline; }
 .passenger-item .icon { font-size: 1.1em; vertical-align: middle; margin-right: 2px;}
 .passenger-item .icon-phone { color: #28a745; }
 .passenger-item .icon-map { color: #dc3545; }
 
-/* Style cho trạng thái */
-.passenger-status {
-    font-weight: bold;
-    padding: 4px 10px;
-    border-radius: 15px;
-    font-size: 0.9em;
-    display: inline-block;
-    text-align: center;
-    min-width: 80px;
-    color: white;
-}
-.status-booked { background-color: #ffc107; color: #343a40; }
-.status-picked_up { background-color: #17a2b8; }
-.status-dropped_off { background-color: #28a745; }
-.status-cancelled { background-color: #6c757d; text-decoration: line-through;}
-.status-no_show { background-color: #dc3545; }
+/* Trạng thái khách */
+.passenger-status { font-weight: bold; padding: 4px 10px; border-radius: 15px; font-size: 0.9em; display: inline-block; text-align: center; min-width: 80px; color: white; }
+.status-booked { background-color: #ffc107; color: #343a40; } .status-picked_up { background-color: #17a2b8; } .status-dropped_off { background-color: #28a745; } .status-cancelled { background-color: #6c757d; text-decoration: line-through;} .status-no_show { background-color: #dc3545; }
 
-/* Style cho các nút hành động trong bảng */
-.passenger-item .col-actions .status-update-btn {
-    padding: 5px 8px;
-    font-size: 0.85em;
-    border-radius: 4px;
-    margin: 2px;
-}
+/* Nút hành động khách */
+.passenger-item .col-actions .status-update-btn { padding: 5px 8px; font-size: 0.85em; border-radius: 4px; margin: 2px; }
 
-/* Style cho nút xóa 'x' mới */
-.delete-passenger-x-btn {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    width: 20px;
-    height: 20px;
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-    border-radius: 50%;
-    font-size: 12px;
-    font-weight: bold;
-    line-height: 18px;
-    text-align: center;
-    cursor: pointer;
-    opacity: 0.7;
-    transition: opacity 0.2s ease, background-color 0.2s ease;
-    padding: 0;
-    gap: 0;
-}
-.delete-passenger-x-btn:hover {
-    opacity: 1;
-    background-color: #f5c6cb;
-    filter: none;
-}
-.delete-passenger-x-btn:active {
-     box-shadow: none;
-}
+/* Nút xóa 'x' */
+.delete-passenger-x-btn { position: absolute; top: 5px; right: 5px; width: 20px; height: 20px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 50%; font-size: 12px; font-weight: bold; line-height: 18px; text-align: center; cursor: pointer; opacity: 0.7; transition: opacity 0.2s ease, background-color 0.2s ease; padding: 0; gap: 0; }
+.delete-passenger-x-btn:hover { opacity: 1; background-color: #f5c6cb; filter: none; }
+.delete-passenger-x-btn:active { box-shadow: none; }
 
-/* Style khi khách đã được đón */
-.passenger-item.picked-up .col-contact,
-.passenger-item.picked-up .col-pickup {
-    opacity: 0;
-    pointer-events: none;
-}
-.passenger-item.picked-up .col-dropoff {
-    font-weight: 600;
-}
+/* Style khi khách đã đón */
+.passenger-item.picked-up .col-contact, .passenger-item.picked-up .col-pickup { opacity: 0; pointer-events: none; }
+.passenger-item.picked-up .col-dropoff { font-weight: 600; }
 
 /* Style cho chế độ "Đang chạy" */
-.passenger-list-container.running-mode .passenger-item.status-cancelled,
-.passenger-list-container.running-mode .passenger-item.status-no_show {
-    display: none;
-}
-.passenger-list-container.running-mode .passenger-item.picked-up .col-contact,
-.passenger-list-container.running-mode .passenger-item.picked-up .col-pickup {
-    opacity: 0;
-    pointer-events: none;
-}
-.passenger-list-container.running-mode .passenger-item.picked-up .col-dropoff {
-    font-weight: 600;
-}
+.passenger-list-container.running-mode .passenger-item.status-cancelled, .passenger-list-container.running-mode .passenger-item.status-no_show { display: none; }
+.passenger-list-container.running-mode .passenger-item.picked-up .col-contact, .passenger-list-container.running-mode .passenger-item.picked-up .col-pickup { opacity: 0; pointer-events: none; }
+.passenger-list-container.running-mode .passenger-item.picked-up .col-dropoff { font-weight: 600; }
 
 
 /* Wake Lock Controls Styling */
-.wake-lock-controls {
-    text-align: center;
-    margin-bottom: 25px;
-    padding: 10px;
-    background-color: #e9ecef;
-    border-radius: 6px;
-}
-#wake-lock-button {
-    background-color: #ffc107;
-    color: #343a40;
-    font-size: 0.95em;
-    padding: 8px 15px;
-}
+.wake-lock-controls { text-align: center; margin-bottom: 25px; padding: 10px; background-color: #e9ecef; border-radius: 6px; }
+#wake-lock-button { background-color: #ffc107; color: #343a40; font-size: 0.95em; padding: 8px 15px; }
 #wake-lock-button:hover { background-color: #e0a800; filter: none; }
 #wake-lock-button.active { background-color: #28a745; color: white; }
 #wake-lock-button.active:hover { background-color: #218838; }
 #wake-lock-status { display: block; margin-top: 8px; font-size: 0.9em; min-height: 1.2em; }
 #wake-lock-status.status-active { color: green; font-weight: bold; }
-#wake-lock-status.status-error,
-#wake-lock-status.status-unsupported { color: #dc3545; }
+#wake-lock-status.status-error, #wake-lock-status.status-unsupported { color: #dc3545; }
 
 
 /* Backup & Restore Section Styling */
-#backup-restore-section {
-    margin-top: 30px;
-    border-top: 2px solid #0056b3;
-}
+#backup-restore-section { margin-top: 30px; border-top: 2px solid #0056b3; }
 #backup-restore-section h2 { color: #0056b3; }
 #backup-restore-section p { font-size: 0.95em; color: #6c757d; margin-bottom: 15px; }
 .backup-controls { display: flex; flex-direction: column; gap: 15px; }
@@ -459,27 +298,14 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 
     /* Responsive cho bảng danh sách khách */
     .passenger-list-header { display: none; }
-    .passenger-item {
-        flex-direction: column; align-items: stretch;
-        margin-bottom: 15px; border: 1px solid #ccc;
-        border-radius: 6px; box-shadow: 0 2px 3px rgba(0,0,0,0.1);
-        position: relative;
-    }
-    .col-name, .col-contact,
-    .col-pickup, .col-dropoff, .col-status, .col-actions {
-        flex-basis: auto; width: 100%; border-right: none;
-        border-bottom: 1px dashed #eee; padding: 10px 15px;
-        justify-content: flex-start; text-align: left;
-    }
+    .passenger-item { flex-direction: column; align-items: stretch; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; box-shadow: 0 2px 3px rgba(0,0,0,0.1); position: relative; }
+    .col-name, .col-contact, .col-pickup, .col-dropoff, .col-status, .col-actions { flex-basis: auto; width: 100%; border-right: none; border-bottom: 1px dashed #eee; padding: 10px 15px; justify-content: flex-start; text-align: left; }
     .passenger-item > div:last-child { border-bottom: none; }
 
     .delete-passenger-x-btn { top: 8px; right: 8px; }
 
-    .passenger-item.picked-up .col-contact,
-    .passenger-item.picked-up .col-pickup { display: none; }
-     .passenger-list-container.running-mode .passenger-item.status-cancelled,
-     .passenger-list-container.running-mode .passenger-item.status-no_show { display: none; }
-
+    .passenger-item.picked-up .col-contact, .passenger-item.picked-up .col-pickup { display: none; }
+     .passenger-list-container.running-mode .passenger-item.status-cancelled, .passenger-list-container.running-mode .passenger-item.status-no_show { display: none; }
 
     /* Thêm label */
     .passenger-item .col-name::before { content: "Tên (Số chỗ): "; font-weight: bold; margin-right: 5px; display: inline-block; width: 100px;}
