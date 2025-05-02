@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Xe Ghép v4</title> <link rel="stylesheet" href="style.css">
+    <title>Quản lý Xe Ghép v5</title> <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>Quản lý Chuyến Đi Xe Ghép</h1>
@@ -40,15 +40,17 @@
     <div id="trip-detail-view" class="hidden"> <button id="back-to-list-btn">← Quay lại Danh sách</button>
         <div class="card">
             <h2 id="detail-trip-title">Chi tiết chuyến đi</h2>
-            <p id="detail-trip-info"></p>
-            <p id="detail-seat-info"></p>
-            <p id="detail-trip-notes" class="hidden"></p> <h3><span class="icon">👥</span> Quản lý Hành Khách</h3>
+            <div id="trip-summary-table">
+                <p>Đang tải thông tin chuyến đi...</p>
+            </div>
+            <h3><span class="icon">👥</span> Quản lý Hành Khách</h3>
 
              <div id="add-passenger-toggle-area">
                  <button id="show-add-passenger-form-btn" class="action-button manage-btn"><span class="icon">➕</span> Thêm khách mới</button>
              </div>
 
-             <form id="add-passenger-form" class="hidden"> <h4>Nhập thông tin khách mới:</h4>
+             <form id="add-passenger-form" class="hidden">
+                 <h4>Nhập thông tin khách mới:</h4>
                  <input type="hidden" id="current-trip-id">
                  <div class="form-row">
                     <input type="text" id="passenger-name" placeholder="Tên khách hàng" required>
@@ -64,11 +66,13 @@
                  <textarea id="passenger-notes" placeholder="Ghi chú cho khách (tùy chọn)..."></textarea>
                  <div class="form-actions">
                      <button type="submit">Lưu Khách</button>
-                     <button type="button" id="cancel-add-passenger-btn">Hủy</button> </div>
+                     <button type="button" id="cancel-add-passenger-btn">Hủy</button>
+                 </div>
             </form>
 
             <h4>Danh sách hành khách đã đặt:</h4>
-            <div class="passenger-list-container"> <div class="passenger-list-header">
+            <div class="passenger-list-container">
+                <div class="passenger-list-header">
                     <div class="col-stt">STT</div>
                     <div class="col-name">Tên khách</div>
                     <div class="col-contact">SĐT</div>
@@ -79,11 +83,11 @@
                     <div class="col-actions">Hành động</div>
                 </div>
                 <div id="passenger-list">
-                    <p>Đang tải...</p> </div>
+                    <p>Đang tải...</p>
+                </div>
             </div>
         </div>
     </div>
-
 
     <script src="script.js"></script>
 </body>
