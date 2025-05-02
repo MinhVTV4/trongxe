@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Xe Ghép v1</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Quản lý Chuyến Đi Xe Ghép</h1>
+
+    <div id="trip-list-view">
+        <div class="card">
+            <h2><span class="icon">&#x1F697;</span> Thêm chuyến đi mới</h2>
+            <form id="add-trip-form">
+                <div class="form-row">
+                    <input type="text" id="trip-origin" placeholder="Điểm đi (VD: Hà Nội)" required>
+                    <input type="text" id="trip-destination" placeholder="Điểm đến (VD: Hải Phòng)" required>
+                </div>
+                <div class="form-row">
+                    <input type="date" id="trip-date" required title="Ngày đi">
+                    <input type="time" id="trip-time" required title="Giờ đi">
+                </div>
+                <div class="form-row">
+                    <input type="number" id="vehicle-seats" placeholder="Số chỗ của xe" required min="1" title="Tổng số chỗ ngồi trên xe bạn">
+                    <input type="number" id="price-per-seat" placeholder="Giá/chỗ (VNĐ)" required min="0" title="Giá vé tiêu chuẩn mỗi chỗ">
+                </div>
+                 <textarea id="trip-notes" placeholder="Ghi chú cho chuyến đi (tùy chọn)..."></textarea>
+                <button type="submit">Tạo Chuyến Đi</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2><span class="icon">&#x1F4D1;</span> Danh sách chuyến đi sắp tới</h2>
+            <div id="trip-list">
+                <p>Đang tải danh sách...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="trip-detail-view" class="hidden">
+        <button id="back-to-list-btn">&larr; Quay lại Danh sách</button>
+        <div class="card">
+            <h2 id="detail-trip-title">Chi tiết chuyến đi</h2>
+            <p id="detail-trip-info"></p>
+            <p id="detail-seat-info"></p>
+            <p id="detail-trip-notes"></p>
+
+            <h3><span class="icon">&#x1F465;</span> Quản lý Hành Khách</h3>
+
+             <h4>Thêm hành khách mới:</h4>
+            <form id="add-passenger-form">
+                 <input type="hidden" id="current-trip-id">
+                 <div class="form-row">
+                    <input type="text" id="passenger-name" placeholder="Tên khách hàng" required>
+                    <input type="text" id="passenger-contact" placeholder="Số điện thoại" required>
+                 </div>
+                 <div class="form-row">
+                    <input type="number" id="passenger-seats" placeholder="Số chỗ đặt" required min="1" value="1">
+                    <input type="text" id="passenger-pickup" placeholder="Địa điểm đón cụ thể" required>
+                 </div>
+                 <div class="form-row">
+                    <input type="text" id="passenger-dropoff" placeholder="Địa điểm trả cụ thể" required>
+                 </div>
+                 <textarea id="passenger-notes" placeholder="Ghi chú cho khách (tùy chọn)..."></textarea>
+                 <button type="submit">Thêm Khách</button>
+            </form>
+
+            <h4>Danh sách hành khách đã đặt:</h4>
+            <div id="passenger-list">
+                </div>
+        </div>
+    </div>
+
+
+    <script src="script.js"></script>
+</body>
+</html>
