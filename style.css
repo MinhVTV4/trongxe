@@ -1,0 +1,123 @@
+/* Reset cơ bản */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0 auto; /* Căn giữa nội dung */
+    max-width: 900px; /* Giới hạn chiều rộng */
+    padding: 15px;
+    background-color: #e9ecef; /* Màu nền nhẹ */
+    color: #343a40; /* Màu chữ chính */
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4 {
+    color: #0056b3; /* Màu tiêu đề */
+    margin-bottom: 0.75em;
+}
+h1 { text-align: center; margin-bottom: 1em; color: #003f7e; }
+h2 .icon, h3 .icon, h4 .icon { margin-right: 8px; } /* Thêm khoảng cách cho icon */
+
+/* Card layout */
+.card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* Forms */
+form { display: flex; flex-direction: column; gap: 15px; }
+.form-row { display: flex; gap: 15px; flex-wrap: wrap; } /* Cho phép xuống dòng */
+.form-row input { flex: 1; min-width: 150px; } /* Input co giãn */
+
+input[type="text"],
+input[type="date"],
+input[type="time"],
+input[type="number"],
+textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+textarea { resize: vertical; min-height: 60px; }
+
+button[type="submit"],
+.action-button,
+#back-to-list-btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+button[type="submit"] { background-color: #007bff; color: white; }
+button[type="submit"]:hover { background-color: #0056b3; }
+
+#back-to-list-btn { background-color: #6c757d; color: white; margin-bottom: 15px; }
+#back-to-list-btn:hover { background-color: #5a6268; }
+
+/* Trip List */
+#trip-list .trip-item {
+    border: 1px solid #e0e0e0;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    background-color: #f8f9fa; /* Nền nhẹ cho từng chuyến */
+    position: relative; /* Để định vị nút xóa */
+}
+.trip-item h3 { margin-top: 0; margin-bottom: 8px; color: #0056b3; }
+.trip-item p { margin: 4px 0; font-size: 0.95em; color: #495057; }
+.trip-item strong { color: #212529; }
+
+.trip-actions { margin-top: 10px; display: flex; gap: 10px; }
+.action-button.manage-btn { background-color: #28a745; color: white; } /* Màu xanh lá */
+.action-button.manage-btn:hover { background-color: #218838; }
+.action-button.delete-btn { background-color: #dc3545; color: white; } /* Màu đỏ */
+.action-button.delete-btn:hover { background-color: #c82333; }
+
+/* Passenger List */
+#passenger-list .passenger-item {
+    border-bottom: 1px dashed #eee;
+    padding: 12px 0;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start; /* Căn trên nếu nội dung dài */
+    gap: 10px; /* Khoảng cách giữa nội dung và nút xóa */
+}
+#passenger-list .passenger-item:last-child { border-bottom: none; }
+.passenger-info p { margin: 2px 0; font-size: 0.9em; color: #495057; }
+.passenger-info strong { font-weight: 500; }
+.passenger-info .pickup-dropoff { font-style: italic; color: #6c757d; }
+
+.delete-passenger-btn {
+    background-color: #fd7e14; /* Màu cam */
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.85em;
+    flex-shrink: 0; /* Không co lại khi tên khách quá dài */
+}
+.delete-passenger-btn:hover { background-color: #e06200; }
+
+/* Trip Detail View */
+#trip-detail-view { /* Ban đầu ẩn đi */ }
+#detail-trip-info, #detail-seat-info, #detail-trip-notes {
+    font-size: 1.05em;
+    margin-bottom: 10px;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 4px;
+}
+#detail-trip-notes { font-style: italic; color: #555; }
+
+/* Utility class */
+.hidden { display: none !important; }
