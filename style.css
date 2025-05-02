@@ -4,7 +4,7 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     margin: 0 auto; /* Căn giữa nội dung */
-    max-width: 1100px; /* Tăng max-width cho bảng rộng hơn */
+    max-width: 1100px;
     padding: 15px;
     background-color: #e9ecef;
     color: #343a40;
@@ -54,17 +54,17 @@ button, .action-button {
     font-size: 1rem;
     font-weight: 500;
     transition: background-color 0.2s ease, filter 0.2s ease;
-    display: inline-flex; /* Giúp icon căn giữa */
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px; /* Khoảng cách giữa icon và text */
+    gap: 8px;
 }
 button:hover, .action-button:hover {
     filter: brightness(110%);
 }
 
 button[type="submit"] { background-color: #007bff; color: white; }
-button[type="submit"]:hover { background-color: #0056b3; filter: none;} /* Override filter */
+button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 
 #back-to-list-btn { background-color: #6c757d; color: white; margin-bottom: 15px; display: inline-block;}
 #back-to-list-btn:hover { background-color: #5a6268; filter: none;}
@@ -96,35 +96,32 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;} /* Overr
 }
 #trip-detail-view h4 { margin-top: 1em; font-size: 1.1em;}
 
-/* === Trip Summary Table Styling === */
-#trip-summary-table {
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    margin-bottom: 25px; /* Khoảng cách với phần quản lý khách */
+/* === Trip Summary Compact Styling === */
+#trip-summary-compact {
     background-color: #f8f9fa;
-    padding: 10px 0; /* Padding trên dưới */
+    border: 1px solid #e0e0e0;
+    border-left: 4px solid #007bff;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 25px;
+    display: grid; /* Sử dụng grid để dễ căn chỉnh */
+    grid-template-columns: auto 1fr; /* Cột label tự động, cột value chiếm phần còn lại */
+    gap: 8px 15px; /* Khoảng cách giữa hàng và cột */
     font-size: 1.05em;
 }
-.summary-row {
-    display: flex;
-    padding: 8px 15px; /* Padding cho mỗi hàng */
-    border-bottom: 1px dashed #e9ecef; /* Đường kẻ ngang mờ */
-}
-#trip-summary-table .summary-row:last-child {
-    border-bottom: none; /* Bỏ đường kẻ cho hàng cuối */
-}
-.summary-label {
-    flex: 0 0 150px; /* Độ rộng cố định cho nhãn */
+.summary-item-label {
     font-weight: 600;
     color: #495057;
+    grid-column: 1 / 2; /* Nằm ở cột 1 */
+    text-align: right; /* Căn phải label */
 }
-.summary-value {
-    flex: 1; /* Giá trị chiếm phần còn lại */
+.summary-item-value {
+    grid-column: 2 / 3; /* Nằm ở cột 2 */
     color: #212529;
 }
-.summary-value .seat-booked { color: red; font-weight: bold; }
-.summary-value .seat-available { color: green; font-weight: bold; }
-.summary-value .trip-notes-value { font-style: italic; color: #555;}
+.summary-item-value .seat-booked { color: red; font-weight: bold; }
+.summary-item-value .seat-available { color: green; font-weight: bold; }
+.summary-item-value .trip-notes-value { font-style: italic; color: #555;}
 
 /* === Add Passenger Form Toggle === */
 #add-passenger-toggle-area {
@@ -160,7 +157,7 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;} /* Overr
     color: white;
 }
 
-/* === Passenger List Table Styling === */
+/* === Passenger List Table Styling (Tinh gọn) === */
 .passenger-list-container {
     width: 100%;
     overflow-x: auto;
@@ -188,7 +185,8 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;} /* Overr
     border-bottom: none;
 }
 
-.col-stt, .col-name, .col-contact, .col-seats,
+/* Định nghĩa độ rộng và style cho từng cột (Đã bỏ .col-stt, .col-seats) */
+.col-name, .col-contact,
 .col-pickup, .col-dropoff, .col-status, .col-actions {
     padding: 12px 10px;
     display: flex;
@@ -201,15 +199,16 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;} /* Overr
     border-right: none;
 }
 
-.col-stt { flex: 0 0 45px; justify-content: center; }
-.col-name { flex: 1 1 150px; min-width: 130px; }
-.col-contact { flex: 1 1 120px; min-width: 110px; }
-.col-seats { flex: 0 0 60px; justify-content: center; text-align: center; }
-.col-pickup { flex: 1 1 180px; min-width: 150px; }
-.col-dropoff { flex: 1 1 180px; min-width: 150px; }
+/* Độ rộng cột (Điều chỉnh lại) */
+.col-name { flex: 1 1 180px; min-width: 150px; font-weight: 500;} /* Tăng độ rộng và làm đậm tên */
+.col-name .seat-count { font-weight: normal; font-size: 0.9em; color: #555; margin-left: 5px;} /* Style cho (x chỗ) */
+.col-contact { flex: 1 1 130px; min-width: 120px; }
+.col-pickup { flex: 1 1 200px; min-width: 170px; } /* Tăng độ rộng */
+.col-dropoff { flex: 1 1 200px; min-width: 170px; } /* Tăng độ rộng */
 .col-status { flex: 0 0 110px; justify-content: center; }
-.col-actions { flex: 0 0 180px; flex-wrap: wrap; gap: 5px; justify-content: center; }
+.col-actions { flex: 0 0 170px; /* Giảm chút vì nút có thể nhỏ hơn */ flex-wrap: wrap; gap: 5px; justify-content: center; }
 
+/* Style cho nội dung bên trong các ô dữ liệu */
 .passenger-item .col-contact a,
 .passenger-item .col-pickup a,
 .passenger-item .col-dropoff a {
@@ -226,6 +225,7 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;} /* Overr
 .passenger-item .icon-phone { color: #28a745; }
 .passenger-item .icon-map { color: #dc3545; }
 
+/* Style cho trạng thái (giữ nguyên) */
 .passenger-status {
     font-weight: bold;
     padding: 4px 10px;
@@ -242,6 +242,7 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;} /* Overr
 .status-cancelled { background-color: #6c757d; text-decoration: line-through;}
 .status-no_show { background-color: #dc3545; }
 
+/* Style cho các nút hành động trong bảng */
 .passenger-item .col-actions .status-update-btn,
 .passenger-item .col-actions .delete-passenger-btn {
     padding: 5px 8px;
@@ -256,21 +257,18 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;} /* Overr
      background-color: #e06200; filter: none;
 }
 
-/* Responsive cho bảng trên màn hình nhỏ */
+/* Responsive (Cập nhật) */
 @media (max-width: 768px) {
-    /* Responsive cho bảng tóm tắt chuyến đi */
-    .summary-row {
-        flex-direction: column; /* Chuyển thành cột */
-        align-items: flex-start; /* Căn trái */
-        padding: 10px 15px;
+    /* Responsive cho bảng tóm tắt chuyến đi (dạng grid vẫn ổn) */
+    #trip-summary-compact {
+        grid-template-columns: 100px 1fr; /* Cố định cột label nhỏ hơn */
+        gap: 5px 10px; /* Giảm khoảng cách */
+        padding: 10px 12px;
     }
-    .summary-label {
-        flex-basis: auto; /* Reset flex-basis */
-        margin-bottom: 3px; /* Khoảng cách nhỏ giữa label và value */
-        color: #0056b3; /* Đổi màu label cho nổi bật */
-    }
+    .summary-item-label { text-align: left; } /* Căn trái label trên mobile */
 
-    /* Responsive cho bảng danh sách khách */
+
+    /* Responsive cho bảng danh sách khách (Đã bỏ STT, Số chỗ) */
     .passenger-list-header {
         display: none;
     }
@@ -282,7 +280,8 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;} /* Overr
         border-radius: 6px;
         box-shadow: 0 2px 3px rgba(0,0,0,0.1);
     }
-    .col-stt, .col-name, .col-contact, .col-seats,
+    /* Bỏ style cho .col-stt, .col-seats */
+    .col-name, .col-contact,
     .col-pickup, .col-dropoff, .col-status, .col-actions {
         flex-basis: auto;
         width: 100%;
@@ -295,19 +294,16 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;} /* Overr
     .passenger-item > div:last-child {
         border-bottom: none;
     }
-    /* Thêm label cho từng ô dữ liệu */
-    .passenger-item .col-stt::before { content: "STT: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 80px;}
-    .passenger-item .col-name::before { content: "Tên: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 80px;}
-    .passenger-item .col-contact::before { content: "SĐT: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 80px;}
-    .passenger-item .col-seats::before { content: "Số chỗ: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 80px;}
-    .passenger-item .col-pickup::before { content: "Đón: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 80px;}
-    .passenger-item .col-dropoff::before { content: "Trả: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 80px;}
-    .passenger-item .col-status::before { content: "Trạng thái: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 80px;}
-    .passenger-item .col-actions { justify-content: center; padding-top: 15px; border-bottom: none;} /* Bỏ border và căn giữa nút */
-    .passenger-item .col-actions::before { display: none; } /* Không cần label cho actions */
+    /* Thêm label (Đã bỏ STT, Số chỗ) */
+    .passenger-item .col-name::before { content: "Tên (Số chỗ): "; font-weight: bold; margin-right: 5px; display: inline-block; width: 100px;} /* Sửa label */
+    .passenger-item .col-contact::before { content: "SĐT: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 100px;}
+    .passenger-item .col-pickup::before { content: "Đón: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 100px;}
+    .passenger-item .col-dropoff::before { content: "Trả: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 100px;}
+    .passenger-item .col-status::before { content: "Trạng thái: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 100px;}
+    .passenger-item .col-actions { justify-content: center; padding-top: 15px; border-bottom: none;}
+    .passenger-item .col-actions::before { display: none; }
 
-
-    .passenger-item .col-status .passenger-status { margin-left: 0px; } /* Reset margin */
+    .passenger-item .col-status .passenger-status { margin-left: 0px; }
 }
 
 
