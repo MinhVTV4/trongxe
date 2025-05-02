@@ -10,19 +10,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Trip Detail View elements
     const backToListBtn = document.getElementById('back-to-list-btn');
     const detailTripTitle = document.getElementById('detail-trip-title');
-    const detailTripInfo = document.getElementById('detail-trip-info');
-    const detailSeatInfo = document.getElementById('detail-seat-info');
-    const detailTripNotes = document.getElementById('detail-trip-notes');
+    // Target the new summary table container
+    const tripSummaryTableDiv = document.getElementById('trip-summary-table'); // <-- Mới
 
     // Passenger Management elements
-    const addPassengerToggleArea = document.getElementById('add-passenger-toggle-area'); // Container for the button
-    const showAddPassengerFormBtn = document.getElementById('show-add-passenger-form-btn'); // Button to show form
-    const addPassengerForm = document.getElementById('add-passenger-form'); // The form itself
-    const cancelAddPassengerBtn = document.getElementById('cancel-add-passenger-btn'); // Cancel button inside the form
-    const passengerListDiv = document.getElementById('passenger-list'); // Container for passenger rows
-    const currentTripIdInput = document.getElementById('current-trip-id'); // Hidden input
+    const addPassengerToggleArea = document.getElementById('add-passenger-toggle-area');
+    const showAddPassengerFormBtn = document.getElementById('show-add-passenger-form-btn');
+    const addPassengerForm = document.getElementById('add-passenger-form');
+    const cancelAddPassengerBtn = document.getElementById('cancel-add-passenger-btn');
+    const passengerListDiv = document.getElementById('passenger-list');
+    const currentTripIdInput = document.getElementById('current-trip-id');
 
-    const STORAGE_KEY = 'xeGhepTrips_v4'; // Key for version 4
+    const STORAGE_KEY = 'xeGhepTrips_v5'; // Key for version 5
 
     // === Data Handling ===
     function getTrips() {
@@ -66,6 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo(0, 0);
     }
 
+    // --- CẬP NHẬT HÀM NÀY ---
     function showTripDetailView(tripId) {
         const trip = findTripById(tripId);
         if (!trip) {
@@ -74,17 +74,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Update trip details
+        // Update trip title
         detailTripTitle.textContent = `Chi tiết: ${trip.origin} → ${trip.destination}`;
-        detailTripInfo.innerHTML = `<strong>Ngày đi:</strong> ${formatDate(trip.date)} lúc ${trip.time}<br>
-                                    <strong>Xe:</strong> ${trip.vehicleSeats} chỗ - <strong>Giá:</strong> ${formatCurrency(trip.pricePerSeat)}/chỗ`;
-        if (trip.notes) {
-             detailTripNotes.textContent = `Ghi chú chuyến đi: ${trip.notes}`;
-             detailTripNotes.classList.remove('hidden');
-        } else {
-            detailTripNotes.classList.add('hidden');
-        }
-        updateSeatInfo(trip); // Update seat count display
+
+        // --- Tạo nội dung cho bảng tóm tắt chuyến đi ---
+        displayTripSummary(trip); // <-- Gọi hàm mới
 
         // Display passenger list (table format)
         displayPassengerList(trip.passengers, tripId);
@@ -98,21 +92,21 @@ document.addEventListener('DOMContentLoaded', () => {
         tripDetailView.classList.remove('hidden');
         window.scrollTo(0, 0);
     }
+    // --- Kết thúc showTripDetailView ---
 
-    // --- Functions to control the add passenger form visibility ---
+
     function showAddPassengerForm() {
-        addPassengerToggleArea.classList.add('hidden'); // Hide the "Add New" button area
-        addPassengerForm.classList.remove('hidden'); // Show the form
-        addPassengerForm.reset(); // Clear any previous input
+        addPassengerToggleArea.classList.add('hidden');
+        addPassengerForm.classList.remove('hidden');
+        addPassengerForm.reset();
         addPassengerForm.querySelector('input[type="text"]')?.focus();
     }
 
     function hideAddPassengerForm() {
-        addPassengerForm.classList.add('hidden'); // Hide the form
-        addPassengerToggleArea.classList.remove('hidden'); // Show the "Add New" button area
-        addPassengerForm.reset(); // Clear the form
+        addPassengerForm.classList.add('hidden');
+        addPassengerToggleArea.classList.remove('hidden');
+        addPassengerForm.reset();
     }
-    // --- End form visibility functions ---
 
 
     // === Rendering Functions ===
@@ -151,15 +145,56 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- CẬP NHẬT HÀM NÀY ĐỂ RENDER BẢNG VÀ SỬA LINK MAPS ---
+    // --- HÀM MỚI: Hiển thị bảng tóm tắt chuyến đi ---
+    function displayTripSummary(trip) {
+        const bookedSeats = calculateBookedSeats(trip);
+        const availableSeats = trip.vehicleSeats - bookedSeats;
+
+        let summaryHTML = `
+            <div class="summary-row">
+                <div class="summary-label">Ngày đi:</div>
+                <div class="summary-value">${formatDate(trip.date)} lúc ${trip.time}</div>
+            </div>
+            <div class="summary-row">
+                <div class="summary-label">Loại xe:</div>
+                <div class="summary-value">${trip.vehicleSeats} chỗ</div>
+            </div>
+            <div class="summary-row">
+                <div class="summary-label">Giá / chỗ:</div>
+                <div class="summary-value">${formatCurrency(trip.pricePerSeat)}</div>
+            </div>
+            <div class="summary-row">
+                <div class="summary-label">Chỗ đã đặt:</div>
+                <div class="summary-value"><span class="seat-booked">${bookedSeats}</span> / ${trip.vehicleSeats}</div>
+            </div>
+             <div class="summary-row">
+                <div class="summary-label">Chỗ còn trống:</div>
+                <div class="summary-value"><span class="seat-available">${availableSeats}</span></div>
+            </div>
+        `;
+
+        // Chỉ thêm hàng ghi chú nếu có
+        if (trip.notes) {
+            summaryHTML += `
+                <div class="summary-row">
+                    <div class="summary-label">Ghi chú CĐ:</div>
+                    <div class="summary-value"><span class="trip-notes-value">${trip.notes}</span></div>
+                </div>
+            `;
+        }
+
+        tripSummaryTableDiv.innerHTML = summaryHTML;
+    }
+    // --- Kết thúc displayTripSummary ---
+
+
     function displayPassengerList(passengers, tripId) {
-        passengerListDiv.innerHTML = ''; // Clear previous list content
+        passengerListDiv.innerHTML = '';
         if (!passengers || passengers.length === 0) {
             passengerListDiv.innerHTML = '<div class="passenger-item"><p style="text-align:center; width:100%; padding: 20px;">Chưa có hành khách nào cho chuyến này.</p></div>';
             return;
         }
 
-        // Sort passengers by status
         passengers.sort((a, b) => {
             const statusOrder = { 'booked': 1, 'picked_up': 2, 'dropped_off': 3, 'no_show': 4, 'cancelled': 5 };
             return (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
@@ -167,20 +202,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         passengers.forEach((passenger, index) => {
             const passengerElement = document.createElement('div');
-            passengerElement.classList.add('passenger-item'); // This is now a row in the table
+            passengerElement.classList.add('passenger-item');
 
-            // === SỬA LỖI LINK GOOGLE MAPS ===
-            // Sử dụng URL tìm kiếm chuẩn của Google Maps
-            const mapSearchBaseUrl = "https://www.google.com/maps/search/";
+            const mapSearchBaseUrl = "https://www.google.com/maps/search/?api=1&query=URL_ENCODED_ADDRESS";
             const mapLinkPickup = `${mapSearchBaseUrl}?api=1&query=${encodeURIComponent(passenger.pickupAddress)}`;
             const mapLinkDropoff = `${mapSearchBaseUrl}?api=1&query=${encodeURIComponent(passenger.dropoffAddress)}`;
-            // ==================================
 
             const { statusText, statusClass } = getStatusInfo(passenger.status);
-            // Sử dụng name + contact làm định danh để xóa/cập nhật
             const passengerIdentifier = `data-passenger-name="${passenger.name}" data-passenger-contact="${passenger.contact}"`;
 
-            // Create divs for each column matching the header structure
             passengerElement.innerHTML = `
                 <div class="col-stt">${index + 1}</div>
                 <div class="col-name">${passenger.name} ${passenger.notes ? `<i style="font-size:0.8em; color: #6c757d;" title="${passenger.notes}"> (ghi chú)</i>` : ''}</div>
@@ -207,10 +237,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="delete-passenger-btn" title="Xóa khách này" data-trip-id="${tripId}" ${passengerIdentifier}><span class="icon">🗑️</span> Xóa</button>
                 </div>
             `;
-            // Append the row to the list container
             passengerListDiv.appendChild(passengerElement);
         });
-    } // --- End displayPassengerList ---
+    }
 
 
     // === Helper Functions ===
@@ -218,11 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return trip.passengers.reduce((sum, p) => (p.status !== 'cancelled' && p.status !== 'no_show') ? sum + p.seatsBooked : sum, 0);
     }
 
-    function updateSeatInfo(trip) {
-         const bookedSeats = calculateBookedSeats(trip);
-         const availableSeats = trip.vehicleSeats - bookedSeats;
-         detailSeatInfo.innerHTML = `<strong>Chỗ ngồi:</strong> <span style="color: red; font-weight: bold;">${bookedSeats}</span> / ${trip.vehicleSeats} (Còn trống: <span style="color: green; font-weight: bold;">${availableSeats}</span>)`;
-    }
+    // Bỏ hàm updateSeatInfo vì đã tích hợp vào displayTripSummary
 
     function formatCurrency(amount) {
         if (isNaN(amount)) return "N/A";
@@ -372,8 +397,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             trips[tripIndex].passengers.push(newPassenger);
             saveTrips(trips);
+            // Re-render passenger list and update summary table
             displayPassengerList(trips[tripIndex].passengers, tripId);
-            updateSeatInfo(trips[tripIndex]);
+            displayTripSummary(trips[tripIndex]); // <-- Cập nhật bảng tóm tắt
             hideAddPassengerForm();
         } else {
              alert('Lỗi: Không tìm thấy chuyến đi để cập nhật.');
@@ -403,25 +429,41 @@ document.addEventListener('DOMContentLoaded', () => {
              return;
          }
 
+         let needsSummaryUpdate = false; // Biến cờ để kiểm tra xem có cần cập nhật summary không
+
          // Handle Delete Button
          if (target.classList.contains('delete-passenger-btn')) {
              if (confirm(`Bạn có chắc muốn xóa hành khách "${passengerName}" (${passengerContact})?`)) {
+                 // Chỉ cần cập nhật summary nếu khách bị xóa không phải là 'cancelled' hoặc 'no_show'
+                 if (trips[tripIndex].passengers[passengerIndex].status !== 'cancelled' && trips[tripIndex].passengers[passengerIndex].status !== 'no_show') {
+                     needsSummaryUpdate = true;
+                 }
                  trips[tripIndex].passengers.splice(passengerIndex, 1);
                  saveTrips(trips);
                  displayPassengerList(trips[tripIndex].passengers, tripId);
-                 updateSeatInfo(trips[tripIndex]);
+                 if (needsSummaryUpdate) {
+                     displayTripSummary(trips[tripIndex]); // Cập nhật summary nếu cần
+                 }
              }
          }
          // Handle Status Update Button
          else if (target.classList.contains('status-update-btn')) {
              const newStatus = target.dataset.newStatus;
+             const oldStatus = trips[tripIndex].passengers[passengerIndex].status;
              const validStatuses = ['booked', 'picked_up', 'dropped_off', 'cancelled', 'no_show'];
-             if (newStatus && validStatuses.includes(newStatus)) {
+
+             if (newStatus && validStatuses.includes(newStatus) && newStatus !== oldStatus) {
+                 // Cần cập nhật summary nếu trạng thái thay đổi từ/sang 'cancelled' hoặc 'no_show'
+                 if ((oldStatus !== 'cancelled' && oldStatus !== 'no_show') !== (newStatus !== 'cancelled' && newStatus !== 'no_show')) {
+                     needsSummaryUpdate = true;
+                 }
                  trips[tripIndex].passengers[passengerIndex].status = newStatus;
                  saveTrips(trips);
                  displayPassengerList(trips[tripIndex].passengers, tripId);
-                 updateSeatInfo(trips[tripIndex]);
-             } else {
+                 if (needsSummaryUpdate) {
+                     displayTripSummary(trips[tripIndex]); // Cập nhật summary nếu cần
+                 }
+             } else if (!newStatus || !validStatuses.includes(newStatus)) {
                  console.warn("Trạng thái mới không hợp lệ:", newStatus);
              }
          }
