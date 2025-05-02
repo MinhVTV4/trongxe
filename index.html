@@ -3,11 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Xe Ghép v6</title> <link rel="stylesheet" href="style.css">
-</head>
+    <title>Quản lý Xe Ghép v7</title> <link rel="stylesheet" href="style.css">
+    </head>
 <body>
     <h1>Quản lý Chuyến Đi Xe Ghép</h1>
 
+    <div class="wake-lock-controls">
+        <button id="wake-lock-button" title="Giữ cho màn hình không tự động tắt khi đang xem ứng dụng">
+            <span class="icon">💡</span> Giữ màn hình sáng
+        </button>
+        <span id="wake-lock-status" class="status-indicator"></span>
+    </div>
     <div id="trip-list-view">
         <div class="card">
             <h2><span class="icon">🚗</span> Thêm chuyến đi mới</h2>
