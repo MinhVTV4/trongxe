@@ -108,7 +108,7 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 
 .trip-actions { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
 .action-button.manage-btn { background-color: #28a745; color: white; }
-.action-button.delete-btn { background-color: #dc3545; color: white; } /* Nút xóa chuyến đi vẫn giữ nguyên */
+.action-button.delete-btn { background-color: #dc3545; color: white; }
 
 /* Trip Detail View */
 #trip-detail-view h3, #trip-detail-view h4 {
@@ -180,7 +180,7 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
     color: white;
 }
 
-/* === Passenger List Table Styling (Giai đoạn 1) === */
+/* Passenger List Table Styling (Giai đoạn 1) */
 .passenger-list-container {
     width: 100%;
     overflow-x: auto;
@@ -195,7 +195,7 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
     align-items: stretch;
     border-bottom: 1px solid #dee2e6;
     padding: 0;
-    position: relative; /* Cần cho việc định vị nút xóa 'x' */
+    position: relative;
 }
 .passenger-list-header {
     background-color: #e9ecef;
@@ -217,7 +217,7 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
     align-items: center;
     word-break: break-word;
     border-right: 1px solid #e9ecef;
-    transition: opacity 0.3s ease, font-weight 0.3s ease; /* Thêm transition */
+    transition: opacity 0.3s ease, font-weight 0.3s ease;
 }
 .passenger-list-header div:last-child,
 .passenger-item > div:last-child {
@@ -229,15 +229,15 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
     flex: 1 1 180px;
     min-width: 150px;
     font-weight: 500;
-    position: relative; /* Để chứa nút xóa 'x' */
-    padding-right: 30px; /* Tạo không gian cho nút xóa 'x' */
+    position: relative;
+    padding-right: 30px;
 }
 .col-name .seat-count { font-weight: normal; font-size: 0.9em; color: #555; margin-left: 5px;}
 .col-contact { flex: 1 1 130px; min-width: 120px; }
 .col-pickup { flex: 1 1 200px; min-width: 170px; }
 .col-dropoff { flex: 1 1 200px; min-width: 170px; }
 .col-status { flex: 0 0 110px; justify-content: center; }
-.col-actions { flex: 0 0 140px; /* Giảm độ rộng vì bỏ nút xóa */ flex-wrap: wrap; gap: 5px; justify-content: center; }
+.col-actions { flex: 0 0 140px; flex-wrap: wrap; gap: 5px; justify-content: center; }
 
 /* Style cho nội dung bên trong các ô dữ liệu */
 .passenger-item .col-name i {
@@ -279,57 +279,58 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 .status-no_show { background-color: #dc3545; }
 
 /* Style cho các nút hành động trong bảng */
-.passenger-item .col-actions .status-update-btn { /* Chỉ còn nút cập nhật trạng thái */
+.passenger-item .col-actions .status-update-btn {
     padding: 5px 8px;
     font-size: 0.85em;
     border-radius: 4px;
     margin: 2px;
 }
 
-/* === Style cho nút xóa 'x' mới === */
+/* Style cho nút xóa 'x' mới */
 .delete-passenger-x-btn {
     position: absolute;
-    top: 5px; /* Điều chỉnh vị trí theo ý muốn */
+    top: 5px;
     right: 5px;
     width: 20px;
     height: 20px;
-    background-color: #f8d7da; /* Nền đỏ nhạt */
-    color: #721c24; /* Chữ đỏ đậm */
+    background-color: #f8d7da;
+    color: #721c24;
     border: 1px solid #f5c6cb;
-    border-radius: 50%; /* Bo tròn */
+    border-radius: 50%;
     font-size: 12px;
     font-weight: bold;
-    line-height: 18px; /* Căn giữa dấu 'x' */
+    line-height: 18px;
     text-align: center;
     cursor: pointer;
-    opacity: 0.7; /* Hơi mờ đi bình thường */
+    opacity: 0.7;
     transition: opacity 0.2s ease, background-color 0.2s ease;
+    /* Bỏ kế thừa padding từ button chung */
+    padding: 0;
+    /* Bỏ kế thừa gap từ button chung */
+    gap: 0;
 }
 .delete-passenger-x-btn:hover {
-    opacity: 1; /* Rõ hơn khi hover */
-    background-color: #f5c6cb; /* Đậm hơn khi hover */
+    opacity: 1;
+    background-color: #f5c6cb;
+    filter: none; /* Bỏ filter hover chung */
 }
-/* ============================== */
+.delete-passenger-x-btn:active {
+     box-shadow: none; /* Bỏ shadow active chung */
+}
 
-/* === Style khi khách đã được đón === */
+/* Style khi khách đã được đón */
 .passenger-item.picked-up .col-contact,
 .passenger-item.picked-up .col-pickup {
-    opacity: 0; /* Ẩn đi bằng cách làm trong suốt */
-    pointer-events: none; /* Không cho tương tác */
-    /* Hoặc dùng display: none nếu muốn ẩn hoàn toàn và co layout */
+    opacity: 0;
+    pointer-events: none;
+    /* Hoặc dùng display: none nếu muốn ẩn hoàn toàn */
     /* display: none; */
-    /* Lưu ý: Nếu dùng display: none, cần điều chỉnh lại flex-basis của các cột khác nếu muốn chúng chiếm không gian */
 }
-
 .passenger-item.picked-up .col-dropoff {
-    font-weight: 600; /* Làm đậm điểm trả */
-    /* Có thể thêm màu sắc hoặc icon khác nếu muốn */
-    /* color: #0056b3; */
+    font-weight: 600;
 }
-/* ================================ */
 
-
-/* === Wake Lock Controls Styling === */
+/* Wake Lock Controls Styling */
 .wake-lock-controls {
     text-align: center;
     margin-bottom: 25px;
@@ -363,7 +364,52 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 #wake-lock-status.status-active { color: green; font-weight: bold; }
 #wake-lock-status.status-error,
 #wake-lock-status.status-unsupported { color: #dc3545; }
-/* ================================ */
+
+
+/* === Backup & Restore Section Styling === */
+#backup-restore-section {
+    margin-top: 30px;
+    border-top: 2px solid #0056b3; /* Đường kẻ phân cách */
+}
+#backup-restore-section h2 {
+    color: #0056b3;
+}
+#backup-restore-section p {
+    font-size: 0.95em;
+    color: #6c757d;
+    margin-bottom: 15px;
+}
+.backup-controls {
+    display: flex;
+    flex-direction: column; /* Xếp chồng lên nhau */
+    gap: 15px; /* Khoảng cách giữa các phần tử */
+}
+#backup-data-textarea {
+    width: 100%;
+    font-family: monospace; /* Font chữ đều cho dễ đọc JSON */
+    font-size: 0.9em;
+    border-color: #ced4da;
+    min-height: 100px; /* Chiều cao tối thiểu */
+}
+#backup-button, #restore-button {
+    align-self: flex-start; /* Chỉ chiếm độ rộng cần thiết */
+}
+#backup-button {
+    background-color: #17a2b8; /* Màu xanh dương */
+    color: white;
+}
+#restore-button {
+    background-color: #ffc107; /* Màu vàng */
+    color: #343a40;
+}
+#restore-status {
+    font-size: 0.9em;
+    font-weight: bold;
+    min-height: 1.2em;
+}
+#restore-status.status-success { color: green; }
+#restore-status.status-error { color: red; }
+/* ====================================== */
 
 
 /* Responsive */
@@ -376,13 +422,14 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
     }
     .summary-item-label { text-align: left; }
 
+
     /* Responsive cho bảng danh sách khách */
     .passenger-list-header { display: none; }
     .passenger-item {
         flex-direction: column; align-items: stretch;
         margin-bottom: 15px; border: 1px solid #ccc;
         border-radius: 6px; box-shadow: 0 2px 3px rgba(0,0,0,0.1);
-        position: relative; /* Cần để định vị nút 'x' */
+        position: relative;
     }
     .col-name, .col-contact,
     .col-pickup, .col-dropoff, .col-status, .col-actions {
@@ -392,20 +439,10 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
     }
     .passenger-item > div:last-child { border-bottom: none; }
 
-    /* Định vị lại nút xóa 'x' trên mobile */
-    .delete-passenger-x-btn {
-        top: 8px;
-        right: 8px;
-    }
-    /* Ẩn cột khi đã đón trên mobile */
-    .passenger-item.picked-up .col-contact,
-    .passenger-item.picked-up .col-pickup {
-         display: none; /* Dùng display none trên mobile cho gọn */
-    }
-    .passenger-item.picked-up .col-dropoff {
-        /* font-weight đã được set, không cần thay đổi */
-    }
+    .delete-passenger-x-btn { top: 8px; right: 8px; }
 
+    .passenger-item.picked-up .col-contact,
+    .passenger-item.picked-up .col-pickup { display: none; }
 
     /* Thêm label */
     .passenger-item .col-name::before { content: "Tên (Số chỗ): "; font-weight: bold; margin-right: 5px; display: inline-block; width: 100px;}
