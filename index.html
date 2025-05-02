@@ -49,7 +49,8 @@
             <div id="trip-summary-compact">
                 <p>Đang tải thông tin chuyến đi...</p>
             </div>
-            <h3><span class="icon">👥</span> Quản lý Hành Khách</h3>
+
+             <h3><span class="icon">👥</span> Quản lý Hành Khách</h3>
 
              <div id="add-passenger-toggle-area">
                  <button id="show-add-passenger-form-btn" class="action-button manage-btn"><span class="icon">➕</span> Thêm khách mới</button>
@@ -79,18 +80,30 @@
             <h4>Danh sách hành khách đã đặt:</h4>
             <div class="passenger-list-container">
                 <div class="passenger-list-header">
-                    <div class="col-name">Tên khách (Số chỗ)</div> <div class="col-contact">SĐT</div>
+                    <div class="col-name">Tên khách (Số chỗ)</div>
+                    <div class="col-contact">SĐT</div>
                     <div class="col-pickup">Điểm đón</div>
                     <div class="col-dropoff">Điểm trả</div>
                     <div class="col-status">Trạng thái</div>
                     <div class="col-actions">Hành động</div>
                 </div>
                 <div id="passenger-list">
-                    <p>Đang tải...</p> </div>
+                    <p>Đang tải...</p>
+                </div>
             </div>
         </div>
     </div>
 
+    <div class="card" id="backup-restore-section">
+        <h2><span class="icon">💾</span> Sao lưu & Khôi phục Dữ liệu</h2>
+        <p>Sao chép đoạn mã dưới đây và lưu vào file text để sao lưu. Để khôi phục, dán mã đã lưu vào ô này và nhấn "Khôi phục".</p>
+        <div class="backup-controls">
+            <button id="backup-button">Sao lưu Hiện tại</button>
+            <textarea id="backup-data-textarea" rows="5" placeholder="Dữ liệu sao lưu sẽ hiện ở đây, hoặc dán dữ liệu cần khôi phục vào đây..."></textarea>
+            <button id="restore-button">Khôi phục Dữ liệu</button>
+            <p id="restore-status" class="status-indicator"></p>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
