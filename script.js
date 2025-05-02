@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const detailTripTitle = document.getElementById('detail-trip-title');
     const tripSummaryCompactDiv = document.getElementById('trip-summary-compact');
     const tripActionButtonsDiv = document.getElementById('trip-action-buttons'); // Nút chính
-    const detailCardSecondaryActionsDiv = document.getElementById('detail-card-secondary-actions'); // Nút phụ (Mới)
+    const detailCardSecondaryActionsDiv = document.getElementById('detail-card-secondary-actions'); // Nút phụ
     const passengerListContainer = document.querySelector('.passenger-list-container');
 
     // Edit Trip Form Elements
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const backupDataTextarea = document.getElementById('backup-data-textarea');
     const restoreStatus = document.getElementById('restore-status');
 
-    const STORAGE_KEY = 'xeGhepTrips_v12'; // Key for version 12
+    const STORAGE_KEY = 'xeGhepTrips_v12'; // Key for version 12 (giữ nguyên hoặc đổi nếu muốn reset data)
 
     // === Trip Status Constants ===
     const TRIP_STATUS = {
@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // === Application State ===
     let currentViewMode = 'active';
+    let newlyAddedPassengerIdentifier = null; // Biến lưu định danh khách vừa thêm
 
     // === Wake Lock Logic (Giữ nguyên) ===
     let wakeLockSentinel = null;
@@ -87,21 +88,26 @@ document.addEventListener('DOMContentLoaded', () => {
         hideEditTripForm();
         updateViewModeUI();
         displayTrips();
-        window.scrollTo(0, 0);
+        // Không cuộn lên đầu ở đây nữa
+        // window.scrollTo(0, 0);
     }
 
-    function showTripDetailView(tripId) {
+    function showTripDetailView(tripId, scrollToPassenger = null) { // Thêm tham số tùy chọn
         const trip = findTripById(tripId); if (!trip) { alert('Không tìm thấy chuyến đi!'); showTripListView(); return; }
         detailTripTitle.textContent = `Chi tiết: ${trip.origin} → ${trip.destination}`;
         displayTripSummaryCompact(trip);
-        displayTripActionButtons(trip); // Hiển thị nút chính và nút phụ
-        displayPassengerList(trip);
+        displayTripActionButtons(trip);
+        displayPassengerList(trip, scrollToPassenger); // Truyền tham số vào đây
         currentTripIdInput.value = tripId;
         hideAddPassengerForm();
         hideEditTripForm();
         if (trip.status === TRIP_STATUS.RUNNING) { passengerListContainer.classList.add('running-mode'); } else { passengerListContainer.classList.remove('running-mode'); }
         if (trip.status === TRIP_STATUS.COMPLETED || trip.status === TRIP_STATUS.CANCELLED) { addPassengerToggleArea.classList.add('hidden'); hideAddPassengerForm(); } else { addPassengerToggleArea.classList.remove('hidden'); }
-        tripListView.classList.add('hidden'); tripDetailView.classList.remove('hidden'); window.scrollTo(0, 0);
+        tripListView.classList.add('hidden'); tripDetailView.classList.remove('hidden');
+        // Chỉ cuộn lên đầu nếu không có yêu cầu cuộn đến khách cụ thể
+        if (!scrollToPassenger) {
+            window.scrollTo(0, 0);
+        }
     }
 
     // --- Add Trip Form Toggle ---
@@ -110,20 +116,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- End Add Trip Form Toggle ---
 
     // --- Edit Trip Form Toggle ---
-    function showEditTripForm(tripId) {
-        const trip = findTripById(tripId); if (!trip || !editTripFormContainer || !editTripForm) return;
-        editTripIdInput.value = trip.id; document.getElementById('edit-trip-origin').value = trip.origin; document.getElementById('edit-trip-destination').value = trip.destination; document.getElementById('edit-trip-date').value = trip.date; document.getElementById('edit-trip-time').value = trip.time; document.getElementById('edit-vehicle-seats').value = trip.vehicleSeats; document.getElementById('edit-price-per-seat').value = trip.pricePerSeat; document.getElementById('edit-trip-notes').value = trip.notes || '';
-        tripSummaryCompactDiv.classList.add('hidden'); tripActionButtonsDiv.classList.add('hidden'); detailCardSecondaryActionsDiv.classList.add('hidden'); // Ẩn cả nút phụ
-        editTripFormContainer.classList.remove('hidden'); editTripForm.querySelector('input[type="text"]')?.focus();
-    }
-    function hideEditTripForm() {
-        if (!editTripFormContainer || !editTripForm) return;
-        editTripFormContainer.classList.add('hidden'); editTripForm.reset();
-        tripSummaryCompactDiv.classList.remove('hidden'); tripActionButtonsDiv.classList.remove('hidden'); detailCardSecondaryActionsDiv.classList.remove('hidden'); // Hiện lại nút phụ
-    }
+    function showEditTripForm(tripId) { const trip = findTripById(tripId); if (!trip || !editTripFormContainer || !editTripForm) return; editTripIdInput.value = trip.id; document.getElementById('edit-trip-origin').value = trip.origin; document.getElementById('edit-trip-destination').value = trip.destination; document.getElementById('edit-trip-date').value = trip.date; document.getElementById('edit-trip-time').value = trip.time; document.getElementById('edit-vehicle-seats').value = trip.vehicleSeats; document.getElementById('edit-price-per-seat').value = trip.pricePerSeat; document.getElementById('edit-trip-notes').value = trip.notes || ''; tripSummaryCompactDiv.classList.add('hidden'); tripActionButtonsDiv.classList.add('hidden'); detailCardSecondaryActionsDiv.classList.add('hidden'); editTripFormContainer.classList.remove('hidden'); editTripForm.querySelector('input[type="text"]')?.focus(); }
+    function hideEditTripForm() { if (!editTripFormContainer || !editTripForm) return; editTripFormContainer.classList.add('hidden'); editTripForm.reset(); tripSummaryCompactDiv.classList.remove('hidden'); tripActionButtonsDiv.classList.remove('hidden'); detailCardSecondaryActionsDiv.classList.remove('hidden'); }
     // --- End Edit Trip Form Toggle ---
 
-    // --- Add Passenger Form Toggle (Giữ nguyên) ---
+    // --- Add Passenger Form Toggle ---
     function showAddPassengerForm() { if (addPassengerToggleArea && addPassengerForm) { addPassengerToggleArea.classList.add('hidden'); addPassengerForm.classList.remove('hidden'); addPassengerForm.reset(); addPassengerForm.querySelector('input[type="text"]')?.focus(); } }
     function hideAddPassengerForm() { if (addPassengerToggleArea && addPassengerForm) { addPassengerForm.classList.add('hidden'); const tripId = currentTripIdInput.value; const trip = findTripById(tripId); if (trip && trip.status !== TRIP_STATUS.COMPLETED && trip.status !== TRIP_STATUS.CANCELLED) { addPassengerToggleArea.classList.remove('hidden'); } else { addPassengerToggleArea.classList.add('hidden'); } addPassengerForm.reset(); } }
     // --- End Add Passenger Form Toggle ---
@@ -135,57 +132,102 @@ document.addEventListener('DOMContentLoaded', () => {
     // === Rendering Functions ===
     function displayTrips() { /* Giữ nguyên */ const allTrips = getTrips(); let tripsToDisplay; if (currentViewMode === 'active') { tripsToDisplay = allTrips.filter(trip => trip.status === TRIP_STATUS.UPCOMING || trip.status === TRIP_STATUS.RUNNING); } else { tripsToDisplay = allTrips.filter(trip => trip.status === TRIP_STATUS.COMPLETED || trip.status === TRIP_STATUS.CANCELLED); } tripListDiv.innerHTML = ''; if (tripsToDisplay.length === 0) { const message = currentViewMode === 'active' ? 'Không có chuyến đi nào sắp tới hoặc đang chạy.' : 'Lịch sử chuyến đi trống.'; tripListDiv.innerHTML = `<p>${message}</p>`; return; } tripsToDisplay.forEach(trip => { const tripElement = document.createElement('div'); tripElement.classList.add('trip-item'); tripElement.classList.add(`trip-status-${trip.status}`); tripElement.dataset.tripId = trip.id; const bookedSeats = calculateBookedSeats(trip); const availableSeats = trip.vehicleSeats - bookedSeats; const seatStatusColor = availableSeats <= 0 ? 'red' : (availableSeats < trip.vehicleSeats ? '#e08100' : 'green'); let statusText = ''; switch(trip.status) { case TRIP_STATUS.RUNNING: statusText = '<span style="color: blue; font-weight: bold;"> (Đang chạy)</span>'; break; case TRIP_STATUS.COMPLETED: statusText = '<span style="color: green;"> (Hoàn thành)</span>'; break; case TRIP_STATUS.CANCELLED: statusText = '<span style="color: grey; text-decoration: line-through;"> (Đã hủy)</span>'; break; } tripElement.innerHTML = `<h3>${trip.origin} → ${trip.destination}${statusText}</h3><p><strong>Ngày:</strong> ${formatDate(trip.date)} lúc ${trip.time}</p><p><strong>Xe:</strong> ${trip.vehicleSeats} chỗ - <strong>Giá:</strong> ${formatCurrency(trip.pricePerSeat)}/chỗ</p><p><strong>Chỗ:</strong> <span style="color: red; font-weight: bold;">${bookedSeats}</span> / ${trip.vehicleSeats} (Còn: <span style="color: ${seatStatusColor}; font-weight: bold;">${availableSeats}</span>)</p>${trip.notes ? `<p><i>Ghi chú: ${trip.notes}</i></p>` : ''}<div class="trip-actions"><button class="action-button manage-btn" data-trip-id="${trip.id}">Xem Chi tiết</button>${trip.status !== TRIP_STATUS.COMPLETED && trip.status !== TRIP_STATUS.CANCELLED ? `<button class="action-button delete-btn" data-trip-id="${trip.id}">Xóa Chuyến</button>` : ''}</div>`; tripListDiv.appendChild(tripElement); }); }
     function displayTripSummaryCompact(trip) { /* Giữ nguyên */ const bookedSeats = calculateBookedSeats(trip); const availableSeats = trip.vehicleSeats - bookedSeats; let summaryHTML = `<div class="summary-item-label">Thời gian:</div><div class="summary-item-value">${formatDate(trip.date)} - ${trip.time}</div><div class="summary-item-label">Tình trạng chỗ:</div><div class="summary-item-value"><span class="seat-booked">${bookedSeats}</span> / ${trip.vehicleSeats} (<span class="seat-available">${availableSeats}</span> trống)</div><div class="summary-item-label">Giá vé:</div><div class="summary-item-value">${formatCurrency(trip.pricePerSeat)} / chỗ</div>`; if (trip.notes) { summaryHTML += `<div class="summary-item-label">Ghi chú:</div><div class="summary-item-value"><span class="trip-notes-value">${trip.notes}</span></div>`; } let statusText = ''; switch(trip.status) { case TRIP_STATUS.RUNNING: statusText = '<span style="color: blue; font-weight: bold;">Đang chạy</span>'; break; case TRIP_STATUS.COMPLETED: statusText = '<span style="color: green;">Hoàn thành</span>'; break; case TRIP_STATUS.CANCELLED: statusText = '<span style="color: grey; text-decoration: line-through;">Đã hủy</span>'; break; case TRIP_STATUS.UPCOMING: statusText = 'Sắp tới'; break; } summaryHTML += `<div class="summary-item-label">Trạng thái:</div><div class="summary-item-value">${statusText}</div>`; tripSummaryCompactDiv.innerHTML = summaryHTML; }
+    function displayTripActionButtons(trip) { /* Giữ nguyên */ tripActionButtonsDiv.innerHTML = ''; detailCardSecondaryActionsDiv.innerHTML = ''; if (trip.status === TRIP_STATUS.UPCOMING) { const startButton = document.createElement('button'); startButton.innerHTML = '<span class="icon">▶️</span> Bắt đầu chuyến đi'; startButton.classList.add('action-button', 'start-trip-btn'); startButton.dataset.tripId = trip.id; tripActionButtonsDiv.appendChild(startButton); const cancelButton = document.createElement('button'); cancelButton.innerHTML = '<span class="icon">🚫</span> Hủy chuyến đi'; cancelButton.classList.add('action-button', 'cancel-trip-btn'); cancelButton.dataset.tripId = trip.id; tripActionButtonsDiv.appendChild(cancelButton); } else if (trip.status === TRIP_STATUS.RUNNING) { const endButton = document.createElement('button'); endButton.innerHTML = '<span class="icon">✅</span> Kết thúc chuyến đi'; endButton.classList.add('action-button', 'end-trip-btn'); endButton.dataset.tripId = trip.id; tripActionButtonsDiv.appendChild(endButton); } if (trip.status === TRIP_STATUS.UPCOMING) { const editButton = document.createElement('button'); editButton.innerHTML = '<span class="icon">✏️</span> Sửa'; editButton.title = 'Sửa thông tin chuyến đi'; editButton.classList.add('action-button', 'edit-trip-btn'); editButton.dataset.tripId = trip.id; detailCardSecondaryActionsDiv.appendChild(editButton); } const copyButton = document.createElement('button'); copyButton.innerHTML = '<span class="icon">📋</span> Sao chép'; copyButton.title = 'Sao chép chuyến đi này'; copyButton.classList.add('action-button', 'copy-trip-btn'); copyButton.dataset.tripId = trip.id; detailCardSecondaryActionsDiv.appendChild(copyButton); }
 
-    // --- Cập nhật hàm này để tách nút chính và nút phụ ---
-    function displayTripActionButtons(trip) {
-        tripActionButtonsDiv.innerHTML = ''; // Xóa nút chính cũ
-        detailCardSecondaryActionsDiv.innerHTML = ''; // Xóa nút phụ cũ
+    // --- Cập nhật hàm này để xử lý cuộn ---
+    function displayPassengerList(trip, passengerToScrollTo = null) { // Thêm tham số passengerToScrollTo
+        const passengers = trip.passengers || [];
+        const tripStatus = trip.status;
 
-        // --- Nút hành động chính ---
-        if (trip.status === TRIP_STATUS.UPCOMING) {
-            const startButton = document.createElement('button');
-            startButton.innerHTML = '<span class="icon">▶️</span> Bắt đầu chuyến đi';
-            startButton.classList.add('action-button', 'start-trip-btn');
-            startButton.dataset.tripId = trip.id;
-            tripActionButtonsDiv.appendChild(startButton); // Thêm vào khu vực chính
-
-            const cancelButton = document.createElement('button');
-            cancelButton.innerHTML = '<span class="icon">🚫</span> Hủy chuyến đi';
-            cancelButton.classList.add('action-button', 'cancel-trip-btn');
-            cancelButton.dataset.tripId = trip.id;
-            tripActionButtonsDiv.appendChild(cancelButton); // Thêm vào khu vực chính
-
-        } else if (trip.status === TRIP_STATUS.RUNNING) {
-            const endButton = document.createElement('button');
-            endButton.innerHTML = '<span class="icon">✅</span> Kết thúc chuyến đi';
-            endButton.classList.add('action-button', 'end-trip-btn');
-            endButton.dataset.tripId = trip.id;
-            tripActionButtonsDiv.appendChild(endButton); // Thêm vào khu vực chính
+        passengerListDiv.innerHTML = '';
+        if (passengers.length === 0) {
+             passengerListDiv.innerHTML = '<div class="passenger-item" style="border:none; justify-content: center; padding: 20px;">Chưa có hành khách nào cho chuyến này.</div>';
+            return;
         }
 
-        // --- Nút hành động phụ (Sửa/Sao chép) ---
-        // Nút Sửa (chỉ hiển thị khi Sắp tới)
-        if (trip.status === TRIP_STATUS.UPCOMING) {
-            const editButton = document.createElement('button');
-            editButton.innerHTML = '<span class="icon">✏️</span> Sửa'; // Chỉ icon + text ngắn
-            editButton.title = 'Sửa thông tin chuyến đi';
-            editButton.classList.add('action-button', 'edit-trip-btn');
-            editButton.dataset.tripId = trip.id;
-            detailCardSecondaryActionsDiv.appendChild(editButton); // Thêm vào khu vực phụ
-        }
+        passengers.sort((a, b) => {
+            const statusOrder = { 'booked': 1, 'picked_up': 2, 'dropped_off': 3, 'no_show': 4, 'cancelled': 5 };
+            return (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99);
+        });
 
-        // Nút Sao chép (luôn hiển thị?)
-        const copyButton = document.createElement('button');
-        copyButton.innerHTML = '<span class="icon">📋</span> Sao chép'; // Chỉ icon + text ngắn
-        copyButton.title = 'Sao chép chuyến đi này';
-        copyButton.classList.add('action-button', 'copy-trip-btn');
-        copyButton.dataset.tripId = trip.id;
-        detailCardSecondaryActionsDiv.appendChild(copyButton); // Thêm vào khu vực phụ
+        let elementToScrollTo = null; // Biến lưu trữ element cần cuộn đến
+
+        passengers.forEach((passenger) => {
+            if (tripStatus === TRIP_STATUS.RUNNING && (passenger.status === 'cancelled' || passenger.status === 'no_show')) {
+                return;
+            }
+            const passengerElement = document.createElement('div');
+            passengerElement.classList.add('passenger-item');
+            passengerElement.classList.add(`status-${passenger.status}`);
+            if (tripStatus === TRIP_STATUS.RUNNING && passenger.status === 'picked_up') {
+                passengerElement.classList.add('picked-up');
+            }
+
+            const mapSearchUrl = "https://www.google.com/maps/search/?api=1&query=";
+            const mapLinkPickup = `${mapSearchUrl}${encodeURIComponent(passenger.pickupAddress)}`;
+            const mapLinkDropoff = `${mapSearchUrl}${encodeURIComponent(passenger.dropoffAddress)}`;
+
+            const { statusText, statusClass } = getStatusInfo(passenger.status);
+            const passengerIdentifier = `data-passenger-name="${passenger.name}" data-passenger-contact="${passenger.contact}"`;
+
+            // === THÊM ID TẠM THỜI ĐỂ CUỘN ===
+            const tempPassengerId = `passenger-${trip.id}-${passenger.name.replace(/\s+/g, '-')}-${passenger.contact}`;
+            passengerElement.id = tempPassengerId;
+            // ===============================
+
+            passengerElement.innerHTML = `
+                <div class="col-name">
+                    ${passenger.name}
+                    <span class="seat-count">(${passenger.seatsBooked} chỗ)</span>
+                    ${passenger.notes ? `<i title="${passenger.notes}">Ghi chú: ${passenger.notes}</i>` : ''}
+                    ${tripStatus !== TRIP_STATUS.COMPLETED && tripStatus !== TRIP_STATUS.CANCELLED ? `<button class="delete-passenger-x-btn" title="Xóa khách này" data-trip-id="${trip.id}" ${passengerIdentifier}>×</button>` : ''}
+                </div>
+                <div class="col-contact">
+                    <a href="tel:${passenger.contact}" title="Gọi ${passenger.name}"><span class="icon icon-phone">☎</span> ${passenger.contact}</a>
+                </div>
+                <div class="col-pickup">
+                    ${passenger.pickupAddress}
+                    <a href="${mapLinkPickup}" target="_blank" title="Xem bản đồ điểm đón"><span class="icon icon-map">📍</span></a>
+                </div>
+                <div class="col-dropoff">
+                    ${passenger.dropoffAddress}
+                    <a href="${mapLinkDropoff}" target="_blank" title="Xem bản đồ điểm trả"><span class="icon icon-map">📍</span></a>
+                </div>
+                <div class="col-status">
+                    <span class="passenger-status ${statusClass}">${statusText}</span>
+                </div>
+                <div class="col-actions">
+                    ${tripStatus !== TRIP_STATUS.COMPLETED && tripStatus !== TRIP_STATUS.CANCELLED && passenger.status === 'booked' ? `<button class="status-update-btn btn-pickup" data-trip-id="${trip.id}" ${passengerIdentifier} data-new-status="picked_up" title="Đánh dấu đã đón"><span class="icon">👍</span> Đón</button>` : ''}
+                    ${tripStatus !== TRIP_STATUS.COMPLETED && tripStatus !== TRIP_STATUS.CANCELLED && passenger.status === 'picked_up' ? `<button class="status-update-btn btn-dropoff" data-trip-id="${trip.id}" ${passengerIdentifier} data-new-status="dropped_off" title="Đánh dấu đã trả"><span class="icon">🏁</span> Trả</button>` : ''}
+                    ${tripStatus !== TRIP_STATUS.COMPLETED && tripStatus !== TRIP_STATUS.CANCELLED && passenger.status !== 'dropped_off' && passenger.status !== 'cancelled' ? `<button class="status-update-btn btn-cancel" data-trip-id="${trip.id}" ${passengerIdentifier} data-new-status="cancelled" title="Hủy chỗ của khách này"><span class="icon">❌</span> Hủy</button>` : ''}
+                    ${tripStatus !== TRIP_STATUS.COMPLETED && tripStatus !== TRIP_STATUS.CANCELLED && (passenger.status === 'booked' || passenger.status === 'picked_up') ? `<button class="status-update-btn btn-noshow" data-trip-id="${trip.id}" ${passengerIdentifier} data-new-status="no_show" title="Đánh dấu khách không đến"><span class="icon">👻</span> Ko đến</button>` : ''}
+                </div>
+            `;
+            passengerListDiv.appendChild(passengerElement);
+
+            // === KIỂM TRA VÀ LƯU ELEMENT CẦN CUỘN ===
+            if (passengerToScrollTo && passenger.name === passengerToScrollTo.name && passenger.contact === passengerToScrollTo.contact) {
+                elementToScrollTo = passengerElement;
+            }
+            // =====================================
+        });
+
+        // === THỰC HIỆN CUỘN SAU KHI VẼ XONG ===
+        if (elementToScrollTo) {
+            // Dùng setTimeout để đảm bảo trình duyệt đã vẽ xong trước khi cuộn
+            setTimeout(() => {
+                elementToScrollTo.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                // Optional: Thêm hiệu ứng highlight tạm thời
+                elementToScrollTo.style.transition = 'background-color 0.5s ease-out';
+                elementToScrollTo.style.backgroundColor = '#fff3cd'; // Màu vàng nhạt
+                setTimeout(() => {
+                    elementToScrollTo.style.backgroundColor = ''; // Xóa màu nền
+                }, 1500); // Giữ highlight trong 1.5 giây
+            }, 100); // Delay nhỏ
+        }
+        // =====================================
     }
-    // --- Kết thúc cập nhật displayTripActionButtons ---
-
-    function displayPassengerList(trip) { /* Giữ nguyên */ const passengers = trip.passengers || []; const tripStatus = trip.status; passengerListDiv.innerHTML = ''; if (passengers.length === 0) { passengerListDiv.innerHTML = '<div class="passenger-item" style="border:none; justify-content: center; padding: 20px;">Chưa có hành khách nào cho chuyến này.</div>'; return; } passengers.sort((a, b) => { const statusOrder = { 'booked': 1, 'picked_up': 2, 'dropped_off': 3, 'no_show': 4, 'cancelled': 5 }; return (statusOrder[a.status] || 99) - (statusOrder[b.status] || 99); }); passengers.forEach((passenger) => { if (tripStatus === TRIP_STATUS.RUNNING && (passenger.status === 'cancelled' || passenger.status === 'no_show')) { return; } const passengerElement = document.createElement('div'); passengerElement.classList.add('passenger-item'); passengerElement.classList.add(`status-${passenger.status}`); if (tripStatus === TRIP_STATUS.RUNNING && passenger.status === 'picked_up') { passengerElement.classList.add('picked-up'); } const mapSearchUrl = "https://www.google.com/maps/search/?api=1&query="; const mapLinkPickup = `${mapSearchUrl}${encodeURIComponent(passenger.pickupAddress)}`; const mapLinkDropoff = `${mapSearchUrl}${encodeURIComponent(passenger.dropoffAddress)}`; const { statusText, statusClass } = getStatusInfo(passenger.status); const passengerIdentifier = `data-passenger-name="${passenger.name}" data-passenger-contact="${passenger.contact}"`; passengerElement.innerHTML = `<div class="col-name">${passenger.name}<span class="seat-count">(${passenger.seatsBooked} chỗ)</span>${passenger.notes ? `<i title="${passenger.notes}">Ghi chú: ${passenger.notes}</i>` : ''}${tripStatus !== TRIP_STATUS.COMPLETED && tripStatus !== TRIP_STATUS.CANCELLED ? `<button class="delete-passenger-x-btn" title="Xóa khách này" data-trip-id="${trip.id}" ${passengerIdentifier}>×</button>` : ''}</div><div class="col-contact"><a href="tel:${passenger.contact}" title="Gọi ${passenger.name}"><span class="icon icon-phone">☎</span> ${passenger.contact}</a></div><div class="col-pickup">${passenger.pickupAddress}<a href="${mapLinkPickup}" target="_blank" title="Xem bản đồ điểm đón"><span class="icon icon-map">📍</span></a></div><div class="col-dropoff">${passenger.dropoffAddress}<a href="${mapLinkDropoff}" target="_blank" title="Xem bản đồ điểm trả"><span class="icon icon-map">📍</span></a></div><div class="col-status"><span class="passenger-status ${statusClass}">${statusText}</span></div><div class="col-actions">${tripStatus !== TRIP_STATUS.COMPLETED && tripStatus !== TRIP_STATUS.CANCELLED && passenger.status === 'booked' ? `<button class="status-update-btn btn-pickup" data-trip-id="${trip.id}" ${passengerIdentifier} data-new-status="picked_up" title="Đánh dấu đã đón"><span class="icon">👍</span> Đón</button>` : ''}${tripStatus !== TRIP_STATUS.COMPLETED && tripStatus !== TRIP_STATUS.CANCELLED && passenger.status === 'picked_up' ? `<button class="status-update-btn btn-dropoff" data-trip-id="${trip.id}" ${passengerIdentifier} data-new-status="dropped_off" title="Đánh dấu đã trả"><span class="icon">🏁</span> Trả</button>` : ''}${tripStatus !== TRIP_STATUS.COMPLETED && tripStatus !== TRIP_STATUS.CANCELLED && passenger.status !== 'dropped_off' && passenger.status !== 'cancelled' ? `<button class="status-update-btn btn-cancel" data-trip-id="${trip.id}" ${passengerIdentifier} data-new-status="cancelled" title="Hủy chỗ của khách này"><span class="icon">❌</span> Hủy</button>` : ''}${tripStatus !== TRIP_STATUS.COMPLETED && tripStatus !== TRIP_STATUS.CANCELLED && (passenger.status === 'booked' || passenger.status === 'picked_up') ? `<button class="status-update-btn btn-noshow" data-trip-id="${trip.id}" ${passengerIdentifier} data-new-status="no_show" title="Đánh dấu khách không đến"><span class="icon">👻</span> Ko đến</button>` : ''}</div>`; passengerListDiv.appendChild(passengerElement); }); }
-    // === End Rendering Functions ===
+    // --- Kết thúc displayPassengerList ---
 
 
     // === Helper Functions (Giữ nguyên) ===
@@ -224,8 +266,34 @@ document.addEventListener('DOMContentLoaded', () => {
     // 7. Cancel Adding Passenger (Giữ nguyên)
     cancelAddPassengerBtn.addEventListener('click', (event) => { event.preventDefault(); hideAddPassengerForm(); });
 
-    // 8. Submit Add Passenger Form (Giữ nguyên)
-    addPassengerForm.addEventListener('submit', (event) => { event.preventDefault(); const tripId = currentTripIdInput.value; if (!tripId) return; const trip = findTripById(tripId); if (!trip) { alert('Lỗi: Không tìm thấy chuyến đi.'); return; } const passengerName = document.getElementById('passenger-name').value.trim(); const passengerContact = document.getElementById('passenger-contact').value.trim(); const seatsBooked = parseInt(document.getElementById('passenger-seats').value); const pickupAddress = document.getElementById('passenger-pickup').value.trim(); const dropoffAddress = document.getElementById('passenger-dropoff').value.trim(); const passengerNotes = document.getElementById('passenger-notes').value.trim(); if (!passengerName || !passengerContact || isNaN(seatsBooked) || seatsBooked <= 0 || !pickupAddress || !dropoffAddress) { alert('Vui lòng nhập đủ thông tin khách.'); return; } const currentBookedSeats = calculateBookedSeats(trip); if (currentBookedSeats + seatsBooked > trip.vehicleSeats) { alert(`Không đủ chỗ! Chỉ còn ${trip.vehicleSeats - currentBookedSeats} chỗ.`); return; } const newPassenger = { name: passengerName, contact: passengerContact, seatsBooked: seatsBooked, pickupAddress: pickupAddress, dropoffAddress: dropoffAddress, notes: passengerNotes, status: 'booked' }; let trips = getTrips(); const tripIndex = trips.findIndex(t => t.id === tripId); if (tripIndex > -1) { const existingPassenger = trips[tripIndex].passengers.find(p => p.name === newPassenger.name && p.contact === newPassenger.contact && p.status !== 'cancelled'); if (existingPassenger) { if (!confirm(`Khách "${newPassenger.name}" (${newPassenger.contact}) đã tồn tại. Vẫn thêm?`)){ hideAddPassengerForm(); return; } } trips[tripIndex].passengers.push(newPassenger); saveTrips(trips); showTripDetailView(tripId); hideAddPassengerForm(); } else { alert('Lỗi: Không tìm thấy chuyến đi.'); } });
+    // --- CẬP NHẬT LISTENER NÀY ĐỂ XỬ LÝ CUỘN ---
+    // 8. Submit Add Passenger Form
+    addPassengerForm.addEventListener('submit', (event) => {
+        event.preventDefault(); const tripId = currentTripIdInput.value; if (!tripId) return; const trip = findTripById(tripId); if (!trip) { alert('Lỗi: Không tìm thấy chuyến đi.'); return; }
+        const passengerName = document.getElementById('passenger-name').value.trim(); const passengerContact = document.getElementById('passenger-contact').value.trim(); const seatsBooked = parseInt(document.getElementById('passenger-seats').value); const pickupAddress = document.getElementById('passenger-pickup').value.trim(); const dropoffAddress = document.getElementById('passenger-dropoff').value.trim(); const passengerNotes = document.getElementById('passenger-notes').value.trim();
+        if (!passengerName || !passengerContact || isNaN(seatsBooked) || seatsBooked <= 0 || !pickupAddress || !dropoffAddress) { alert('Vui lòng nhập đủ thông tin khách.'); return; }
+        const currentBookedSeats = calculateBookedSeats(trip); if (currentBookedSeats + seatsBooked > trip.vehicleSeats) { alert(`Không đủ chỗ! Chỉ còn ${trip.vehicleSeats - currentBookedSeats} chỗ.`); return; }
+
+        const newPassenger = { name: passengerName, contact: passengerContact, seatsBooked: seatsBooked, pickupAddress: pickupAddress, dropoffAddress: dropoffAddress, notes: passengerNotes, status: 'booked' };
+
+        let trips = getTrips(); const tripIndex = trips.findIndex(t => t.id === tripId);
+        if (tripIndex > -1) {
+             const existingPassenger = trips[tripIndex].passengers.find(p => p.name === newPassenger.name && p.contact === newPassenger.contact && p.status !== 'cancelled');
+             if (existingPassenger) { if (!confirm(`Khách "${newPassenger.name}" (${newPassenger.contact}) đã tồn tại. Vẫn thêm?`)){ hideAddPassengerForm(); return; } }
+
+            trips[tripIndex].passengers.push(newPassenger);
+            saveTrips(trips);
+
+            // --- THAY ĐỔI Ở ĐÂY ---
+            // Gọi lại showTripDetailView và truyền thông tin khách mới để cuộn đến
+            showTripDetailView(tripId, newPassenger);
+            // --- KẾT THÚC THAY ĐỔI ---
+
+            hideAddPassengerForm();
+        } else { alert('Lỗi: Không tìm thấy chuyến đi.'); }
+    });
+    // --- Kết thúc cập nhật listener ---
+
 
      // 9. Click on Passenger List (Update Status / Delete Passenger) (Giữ nguyên)
      passengerListDiv.addEventListener('click', (event) => { const target = event.target.closest('button'); if (!target) return; const tripId = target.dataset.tripId; const passengerName = target.dataset.passengerName; const passengerContact = target.dataset.passengerContact; if (!tripId || passengerName === undefined || passengerContact === undefined) return; let trips = getTrips(); const tripIndex = trips.findIndex(t => t.id === tripId); if (tripIndex === -1) { console.error("Lỗi: Không tìm thấy chuyến đi."); return; } const passengerIndex = trips[tripIndex].passengers.findIndex(p => p.name === passengerName && p.contact === passengerContact); if (passengerIndex === -1) { console.warn("Cảnh báo: Không tìm thấy hành khách."); showTripDetailView(tripId); return; } let needsSummaryUpdate = false; if (target.classList.contains('delete-passenger-x-btn')) { if (confirm(`Xóa khách "${passengerName}" (${passengerContact})?`)) { if (trips[tripIndex].passengers[passengerIndex].status !== 'cancelled' && trips[tripIndex].passengers[passengerIndex].status !== 'no_show') { needsSummaryUpdate = true; } trips[tripIndex].passengers.splice(passengerIndex, 1); saveTrips(trips); showTripDetailView(tripId); } } else if (target.classList.contains('status-update-btn')) { const newStatus = target.dataset.newStatus; const oldStatus = trips[tripIndex].passengers[passengerIndex].status; const validStatuses = ['booked', 'picked_up', 'dropped_off', 'cancelled', 'no_show']; if (newStatus && validStatuses.includes(newStatus) && newStatus !== oldStatus) { if ((oldStatus !== 'cancelled' && oldStatus !== 'no_show') !== (newStatus !== 'cancelled' && newStatus !== 'no_show')) { needsSummaryUpdate = true; } trips[tripIndex].passengers[passengerIndex].status = newStatus; saveTrips(trips); showTripDetailView(tripId); } else if (!newStatus || !validStatuses.includes(newStatus)) { console.warn("Trạng thái mới không hợp lệ:", newStatus); } } });
@@ -239,30 +307,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // 12. Chuyển đổi giữa View Active và History (Giữ nguyên)
     viewModeToggleButton.addEventListener('click', () => { currentViewMode = (currentViewMode === 'active') ? 'history' : 'active'; showTripListView(); });
 
-    // 13. Xử lý các nút hành động CHÍNH của chuyến đi
-    tripActionButtonsDiv.addEventListener('click', (event) => {
-        const target = event.target.closest('button');
-        if (!target) return;
-        const tripId = target.dataset.tripId;
-        if (!tripId) return;
+    // 13. Xử lý các nút hành động CHÍNH của chuyến đi (Giữ nguyên)
+    tripActionButtonsDiv.addEventListener('click', (event) => { const target = event.target.closest('button'); if (!target) return; const tripId = target.dataset.tripId; if (!tripId) return; if (target.classList.contains('start-trip-btn')) { handleStartTrip(tripId); } else if (target.classList.contains('end-trip-btn')) { handleEndTrip(tripId); } else if (target.classList.contains('cancel-trip-btn')) { handleCancelTrip(tripId); } });
 
-        if (target.classList.contains('start-trip-btn')) { handleStartTrip(tripId); }
-        else if (target.classList.contains('end-trip-btn')) { handleEndTrip(tripId); }
-        else if (target.classList.contains('cancel-trip-btn')) { handleCancelTrip(tripId); }
-    });
-
-    // --- Listener MỚI cho các nút hành động PHỤ (Sửa/Sao chép) ---
-    detailCardSecondaryActionsDiv.addEventListener('click', (event) => {
-        const target = event.target.closest('button');
-        if (!target) return;
-        const tripId = target.dataset.tripId;
-        if (!tripId) return;
-
-        if (target.classList.contains('edit-trip-btn')) { handleEditTrip(tripId); }
-        else if (target.classList.contains('copy-trip-btn')) { handleCopyTrip(tripId); }
-    });
-    // --- Kết thúc listener mới ---
-
+    // 14. Listener cho các nút hành động PHỤ (Sửa/Sao chép) (Giữ nguyên)
+    detailCardSecondaryActionsDiv.addEventListener('click', (event) => { const target = event.target.closest('button'); if (!target) return; const tripId = target.dataset.tripId; if (!tripId) return; if (target.classList.contains('edit-trip-btn')) { handleEditTrip(tripId); } else if (target.classList.contains('copy-trip-btn')) { handleCopyTrip(tripId); } });
 
     // --- Các hàm xử lý hành động chuyến đi (Giữ nguyên) ---
     function handleStartTrip(tripId) { if (updateTripStatus(tripId, TRIP_STATUS.RUNNING)) { showTripDetailView(tripId); } }
@@ -272,21 +321,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleCopyTrip(tripId) { const originalTrip = findTripById(tripId); if (!originalTrip) { alert("Lỗi: Không tìm thấy chuyến đi gốc."); return; } const newTrip = { ...originalTrip, id: Date.now().toString() + Math.random().toString(36).substring(2, 8), status: TRIP_STATUS.UPCOMING, passengers: [] }; const trips = getTrips(); trips.push(newTrip); saveTrips(trips); alert(`Đã sao chép chuyến đi "${originalTrip.origin} → ${originalTrip.destination}".`); currentViewMode = 'active'; showTripListView(); }
     // --- Kết thúc các hàm xử lý ---
 
-    // --- Event Listener cho Form Sửa Chuyến Đi ---
-    if (editTripForm) {
-        editTripForm.addEventListener('submit', (event) => {
-            event.preventDefault(); const tripId = editTripIdInput.value; if (!tripId) { alert("Lỗi: Không xác định được chuyến đi."); return; }
-            const updatedTripData = { origin: document.getElementById('edit-trip-origin').value.trim(), destination: document.getElementById('edit-trip-destination').value.trim(), date: document.getElementById('edit-trip-date').value, time: document.getElementById('edit-trip-time').value, vehicleSeats: parseInt(document.getElementById('edit-vehicle-seats').value), pricePerSeat: parseInt(document.getElementById('edit-price-per-seat').value), notes: document.getElementById('edit-trip-notes').value.trim(), };
-            if (!updatedTripData.date || formatDate(updatedTripData.date) === updatedTripData.date) { alert('Ngày đi không hợp lệ.'); return; } if (!updatedTripData.origin || !updatedTripData.destination || !updatedTripData.time || isNaN(updatedTripData.vehicleSeats) || updatedTripData.vehicleSeats <= 0 || isNaN(updatedTripData.pricePerSeat)) { alert('Vui lòng nhập đủ thông tin hợp lệ.'); return; }
-            let trips = getTrips(); const tripIndex = trips.findIndex(t => t.id === tripId);
-            if (tripIndex > -1) { trips[tripIndex] = { ...trips[tripIndex], ...updatedTripData }; saveTrips(trips); hideEditTripForm(); showTripDetailView(tripId); alert("Cập nhật thành công!"); }
-            else { alert("Lỗi: Không tìm thấy chuyến đi."); hideEditTripForm(); }
-        });
-    }
+    // --- Event Listener cho Form Sửa Chuyến Đi (Giữ nguyên) ---
+    if (editTripForm) { editTripForm.addEventListener('submit', (event) => { event.preventDefault(); const tripId = editTripIdInput.value; if (!tripId) { alert("Lỗi: Không xác định được chuyến đi."); return; } const updatedTripData = { origin: document.getElementById('edit-trip-origin').value.trim(), destination: document.getElementById('edit-trip-destination').value.trim(), date: document.getElementById('edit-trip-date').value, time: document.getElementById('edit-trip-time').value, vehicleSeats: parseInt(document.getElementById('edit-vehicle-seats').value), pricePerSeat: parseInt(document.getElementById('edit-price-per-seat').value), notes: document.getElementById('edit-trip-notes').value.trim(), }; if (!updatedTripData.date || formatDate(updatedTripData.date) === updatedTripData.date) { alert('Ngày đi không hợp lệ.'); return; } if (!updatedTripData.origin || !updatedTripData.destination || !updatedTripData.time || isNaN(updatedTripData.vehicleSeats) || updatedTripData.vehicleSeats <= 0 || isNaN(updatedTripData.pricePerSeat)) { alert('Vui lòng nhập đủ thông tin hợp lệ.'); return; } let trips = getTrips(); const tripIndex = trips.findIndex(t => t.id === tripId); if (tripIndex > -1) { trips[tripIndex] = { ...trips[tripIndex], ...updatedTripData }; saveTrips(trips); hideEditTripForm(); showTripDetailView(tripId); alert("Cập nhật thành công!"); } else { alert("Lỗi: Không tìm thấy chuyến đi."); hideEditTripForm(); } }); }
 
-    // --- Event Listener cho nút Hủy Sửa ---
+    // --- Event Listener cho nút Hủy Sửa (Giữ nguyên) ---
     if (cancelEditTripBtn) { cancelEditTripBtn.addEventListener('click', (event) => { event.preventDefault(); hideEditTripForm(); }); }
-    // --- Kết thúc Event Listener mới ---
 
 
     // === Initial Load ===
