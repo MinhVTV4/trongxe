@@ -6,7 +6,7 @@ body {
     margin: 0 auto; /* Căn giữa nội dung */
     max-width: 1100px;
     padding: 15px;
-    background-color: #f0f2f5; /* Màu nền nhẹ nhàng hơn */
+    background-color: #f0f2f5;
     color: #343a40;
     line-height: 1.6;
 }
@@ -15,14 +15,14 @@ h1, h2, h3, h4 {
     color: #0056b3;
     margin-bottom: 0.75em;
 }
-h1 { text-align: center; margin-bottom: 0.5em; color: #003f7e; } /* Giảm margin bottom */
+h1 { text-align: center; margin-bottom: 0.5em; color: #003f7e; }
 h2 .icon, h3 .icon, h4 .icon { margin-right: 8px; }
 
 /* Card layout */
 .card {
     background-color: #fff;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); /* Shadow nhẹ hơn */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
     padding: 20px;
     margin-bottom: 20px;
 }
@@ -42,7 +42,7 @@ textarea {
     border: 1px solid #ced4da;
     border-radius: 4px;
     font-size: 1rem;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease; /* Thêm hiệu ứng focus */
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 input[type="text"]:focus,
 input[type="date"]:focus,
@@ -60,24 +60,24 @@ textarea { resize: vertical; min-height: 60px; }
 button, .action-button {
     padding: 10px 18px;
     border: none;
-    border-radius: 5px; /* Bo tròn hơn chút */
+    border-radius: 5px;
     cursor: pointer;
     font-size: 1rem;
     font-weight: 500;
-    transition: background-color 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease; /* Thêm transition shadow */
+    transition: background-color 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05); /* Thêm shadow nhẹ */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 button:hover, .action-button:hover {
     filter: brightness(110%);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Shadow rõ hơn khi hover */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 button:active, .action-button:active {
     filter: brightness(95%);
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); /* Hiệu ứng nhấn xuống */
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
 }
 
 
@@ -93,12 +93,12 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
     padding: 15px;
     margin-bottom: 15px;
     border-radius: 6px;
-    background-color: #fff; /* Đổi nền trắng cho trip item */
+    background-color: #fff;
     position: relative;
     transition: box-shadow 0.2s ease;
 }
 #trip-list .trip-item:hover {
-    box-shadow: 0 4px 8px rgba(0,0,0,0.08); /* Hiệu ứng nổi lên khi hover */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
 }
 
 .trip-item h3 { margin-top: 0; margin-bottom: 8px; color: #0056b3; }
@@ -108,7 +108,7 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 
 .trip-actions { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
 .action-button.manage-btn { background-color: #28a745; color: white; }
-.action-button.delete-btn { background-color: #dc3545; color: white; }
+.action-button.delete-btn { background-color: #dc3545; color: white; } /* Nút xóa chuyến đi vẫn giữ nguyên */
 
 /* Trip Detail View */
 #trip-detail-view h3, #trip-detail-view h4 {
@@ -180,7 +180,7 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
     color: white;
 }
 
-/* Passenger List Table Styling (Tinh gọn) */
+/* === Passenger List Table Styling (Giai đoạn 1) === */
 .passenger-list-container {
     width: 100%;
     overflow-x: auto;
@@ -195,9 +195,10 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
     align-items: stretch;
     border-bottom: 1px solid #dee2e6;
     padding: 0;
+    position: relative; /* Cần cho việc định vị nút xóa 'x' */
 }
 .passenger-list-header {
-    background-color: #e9ecef; /* Màu header nhạt hơn */
+    background-color: #e9ecef;
     font-weight: 600;
     color: #495057;
     border-top-left-radius: 5px;
@@ -216,6 +217,7 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
     align-items: center;
     word-break: break-word;
     border-right: 1px solid #e9ecef;
+    transition: opacity 0.3s ease, font-weight 0.3s ease; /* Thêm transition */
 }
 .passenger-list-header div:last-child,
 .passenger-item > div:last-child {
@@ -223,18 +225,24 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 }
 
 /* Độ rộng cột */
-.col-name { flex: 1 1 180px; min-width: 150px; font-weight: 500;}
+.col-name {
+    flex: 1 1 180px;
+    min-width: 150px;
+    font-weight: 500;
+    position: relative; /* Để chứa nút xóa 'x' */
+    padding-right: 30px; /* Tạo không gian cho nút xóa 'x' */
+}
 .col-name .seat-count { font-weight: normal; font-size: 0.9em; color: #555; margin-left: 5px;}
 .col-contact { flex: 1 1 130px; min-width: 120px; }
 .col-pickup { flex: 1 1 200px; min-width: 170px; }
 .col-dropoff { flex: 1 1 200px; min-width: 170px; }
 .col-status { flex: 0 0 110px; justify-content: center; }
-.col-actions { flex: 0 0 170px; flex-wrap: wrap; gap: 5px; justify-content: center; }
+.col-actions { flex: 0 0 140px; /* Giảm độ rộng vì bỏ nút xóa */ flex-wrap: wrap; gap: 5px; justify-content: center; }
 
 /* Style cho nội dung bên trong các ô dữ liệu */
-.passenger-item .col-name i { /* Style cho ghi chú khách */
+.passenger-item .col-name i {
      font-size: 0.85em; color: #6c757d; display: block; margin-top: 4px; font-style: normal;
-     white-space: nowrap; overflow: hidden; text-overflow: ellipsis; /* Rút gọn nếu quá dài */
+     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
 .passenger-item .col-contact a,
@@ -271,61 +279,90 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 .status-no_show { background-color: #dc3545; }
 
 /* Style cho các nút hành động trong bảng */
-.passenger-item .col-actions .status-update-btn,
-.passenger-item .col-actions .delete-passenger-btn {
+.passenger-item .col-actions .status-update-btn { /* Chỉ còn nút cập nhật trạng thái */
     padding: 5px 8px;
     font-size: 0.85em;
     border-radius: 4px;
     margin: 2px;
 }
-.passenger-item .col-actions .delete-passenger-btn {
-    background-color: #fd7e14;
+
+/* === Style cho nút xóa 'x' mới === */
+.delete-passenger-x-btn {
+    position: absolute;
+    top: 5px; /* Điều chỉnh vị trí theo ý muốn */
+    right: 5px;
+    width: 20px;
+    height: 20px;
+    background-color: #f8d7da; /* Nền đỏ nhạt */
+    color: #721c24; /* Chữ đỏ đậm */
+    border: 1px solid #f5c6cb;
+    border-radius: 50%; /* Bo tròn */
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 18px; /* Căn giữa dấu 'x' */
+    text-align: center;
+    cursor: pointer;
+    opacity: 0.7; /* Hơi mờ đi bình thường */
+    transition: opacity 0.2s ease, background-color 0.2s ease;
 }
-.passenger-item .col-actions .delete-passenger-btn:hover {
-     background-color: #e06200; filter: none;
+.delete-passenger-x-btn:hover {
+    opacity: 1; /* Rõ hơn khi hover */
+    background-color: #f5c6cb; /* Đậm hơn khi hover */
 }
+/* ============================== */
+
+/* === Style khi khách đã được đón === */
+.passenger-item.picked-up .col-contact,
+.passenger-item.picked-up .col-pickup {
+    opacity: 0; /* Ẩn đi bằng cách làm trong suốt */
+    pointer-events: none; /* Không cho tương tác */
+    /* Hoặc dùng display: none nếu muốn ẩn hoàn toàn và co layout */
+    /* display: none; */
+    /* Lưu ý: Nếu dùng display: none, cần điều chỉnh lại flex-basis của các cột khác nếu muốn chúng chiếm không gian */
+}
+
+.passenger-item.picked-up .col-dropoff {
+    font-weight: 600; /* Làm đậm điểm trả */
+    /* Có thể thêm màu sắc hoặc icon khác nếu muốn */
+    /* color: #0056b3; */
+}
+/* ================================ */
+
 
 /* === Wake Lock Controls Styling === */
 .wake-lock-controls {
-    text-align: center; /* Căn giữa nút và status */
-    margin-bottom: 25px; /* Khoảng cách với phần dưới */
+    text-align: center;
+    margin-bottom: 25px;
     padding: 10px;
-    background-color: #e9ecef; /* Nền nhẹ */
+    background-color: #e9ecef;
     border-radius: 6px;
 }
-
 #wake-lock-button {
-    background-color: #ffc107; /* Màu vàng */
-    color: #343a40; /* Chữ đen */
+    background-color: #ffc107;
+    color: #343a40;
     font-size: 0.95em;
     padding: 8px 15px;
 }
 #wake-lock-button:hover {
-    background-color: #e0a800; /* Vàng đậm hơn khi hover */
+    background-color: #e0a800;
     filter: none;
 }
-#wake-lock-button.active { /* Style khi đang bật */
-    background-color: #28a745; /* Màu xanh lá */
+#wake-lock-button.active {
+    background-color: #28a745;
     color: white;
 }
 #wake-lock-button.active:hover {
     background-color: #218838;
 }
-
 #wake-lock-status {
-    display: block; /* Hiển thị thành dòng riêng */
+    display: block;
     margin-top: 8px;
     font-size: 0.9em;
-    min-height: 1.2em; /* Đảm bảo có không gian dù không có text */
+    min-height: 1.2em;
 }
-#wake-lock-status.status-active {
-    color: green;
-    font-weight: bold;
-}
+#wake-lock-status.status-active { color: green; font-weight: bold; }
 #wake-lock-status.status-error,
-#wake-lock-status.status-unsupported {
-    color: #dc3545; /* Màu đỏ cho lỗi/không hỗ trợ */
-}
+#wake-lock-status.status-unsupported { color: #dc3545; }
 /* ================================ */
 
 
@@ -339,32 +376,37 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
     }
     .summary-item-label { text-align: left; }
 
-
     /* Responsive cho bảng danh sách khách */
-    .passenger-list-header {
-        display: none;
-    }
+    .passenger-list-header { display: none; }
     .passenger-item {
-        flex-direction: column;
-        align-items: stretch;
-        margin-bottom: 15px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+        flex-direction: column; align-items: stretch;
+        margin-bottom: 15px; border: 1px solid #ccc;
+        border-radius: 6px; box-shadow: 0 2px 3px rgba(0,0,0,0.1);
+        position: relative; /* Cần để định vị nút 'x' */
     }
     .col-name, .col-contact,
     .col-pickup, .col-dropoff, .col-status, .col-actions {
-        flex-basis: auto;
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px dashed #eee;
-        padding: 10px 15px;
-        justify-content: flex-start;
-        text-align: left;
+        flex-basis: auto; width: 100%; border-right: none;
+        border-bottom: 1px dashed #eee; padding: 10px 15px;
+        justify-content: flex-start; text-align: left;
     }
-    .passenger-item > div:last-child {
-        border-bottom: none;
+    .passenger-item > div:last-child { border-bottom: none; }
+
+    /* Định vị lại nút xóa 'x' trên mobile */
+    .delete-passenger-x-btn {
+        top: 8px;
+        right: 8px;
     }
+    /* Ẩn cột khi đã đón trên mobile */
+    .passenger-item.picked-up .col-contact,
+    .passenger-item.picked-up .col-pickup {
+         display: none; /* Dùng display none trên mobile cho gọn */
+    }
+    .passenger-item.picked-up .col-dropoff {
+        /* font-weight đã được set, không cần thay đổi */
+    }
+
+
     /* Thêm label */
     .passenger-item .col-name::before { content: "Tên (Số chỗ): "; font-weight: bold; margin-right: 5px; display: inline-block; width: 100px;}
     .passenger-item .col-contact::before { content: "SĐT: "; font-weight: bold; margin-right: 5px; display: inline-block; width: 100px;}
