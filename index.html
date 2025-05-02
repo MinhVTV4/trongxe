@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Xe Ghép v11</title> <link rel="stylesheet" href="style.css">
+    <title>Quản lý Xe Ghép v12</title> <link rel="stylesheet" href="style.css">
     </head>
 <body>
     <h1>Quản lý Chuyến Đi Xe Ghép</h1>
@@ -57,7 +57,9 @@
 
     <div id="trip-detail-view" class="hidden">
         <button id="back-to-list-btn">← Quay lại Danh sách</button>
-        <div class="card">
+        <div class="card detail-card-container">
+            <div id="detail-card-secondary-actions" class="detail-card-actions">
+                </div>
             <h2 id="detail-trip-title">Chi tiết chuyến đi</h2>
             <div id="trip-summary-compact">
                 <p>Đang tải thông tin chuyến đi...</p>
@@ -69,7 +71,8 @@
              <div id="edit-trip-form-container" class="hidden">
                  <form id="edit-trip-form">
                      <h4><span class="icon">✏️</span> Chỉnh sửa thông tin chuyến đi</h4>
-                     <input type="hidden" id="edit-trip-id"> <div class="form-row">
+                     <input type="hidden" id="edit-trip-id">
+                     <div class="form-row">
                          <input type="text" id="edit-trip-origin" placeholder="Điểm đi" required>
                          <input type="text" id="edit-trip-destination" placeholder="Điểm đến" required>
                      </div>
@@ -88,6 +91,7 @@
                       </div>
                  </form>
              </div>
+
              <h3><span class="icon">👥</span> Quản lý Hành Khách</h3>
              <div id="add-passenger-toggle-area">
                  <button id="show-add-passenger-form-btn" class="action-button manage-btn"><span class="icon">➕</span> Thêm khách mới</button>
