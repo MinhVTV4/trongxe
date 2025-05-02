@@ -27,6 +27,14 @@ h2 .icon, h3 .icon, h4 .icon { margin-right: 8px; }
     margin-bottom: 20px;
 }
 
+/* === Thêm position: relative cho card chi tiết === */
+.detail-card-container {
+    position: relative;
+    padding-top: 50px; /* Tăng padding top để tránh nút phụ đè lên tiêu đề */
+}
+/* ============================================ */
+
+
 /* Forms chung */
 form { display: flex; flex-direction: column; gap: 15px; }
 .form-row { display: flex; gap: 15px; flex-wrap: wrap; }
@@ -160,10 +168,10 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 .summary-item-value .seat-available { color: green; font-weight: bold; }
 .summary-item-value .trip-notes-value { font-style: italic; color: #555;}
 
-/* Trip Detail Actions Styling */
+/* Trip Detail Actions Styling (Nút chính: Bắt đầu/Kết thúc/Hủy) */
 .trip-detail-actions {
     display: flex;
-    flex-wrap: wrap; /* Cho phép xuống dòng nếu nhiều nút */
+    flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 25px;
     padding-top: 15px;
@@ -173,30 +181,39 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 .start-trip-btn { background-color: #007bff; color: white; }
 .end-trip-btn { background-color: #28a745; color: white; }
 .cancel-trip-btn { background-color: #dc3545; color: white; }
-/* === Style cho nút Sửa và Sao chép === */
+
+/* === Secondary Actions Styling (Nút phụ: Sửa/Sao chép) === */
+#detail-card-secondary-actions {
+    position: absolute;
+    top: 15px; /* Khoảng cách từ đỉnh card */
+    right: 15px; /* Khoảng cách từ mép phải card */
+    display: flex;
+    gap: 8px;
+}
+#detail-card-secondary-actions .action-button {
+    padding: 6px 10px; /* Nút nhỏ hơn */
+    font-size: 0.9em;
+    min-width: 40px; /* Đảm bảo nút không quá bé */
+    box-shadow: none; /* Bỏ shadow mặc định cho gọn */
+}
+#detail-card-secondary-actions .action-button:hover {
+     box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Thêm shadow nhẹ khi hover */
+}
 .edit-trip-btn { background-color: #ffc107; color: #343a40; } /* Vàng */
 .copy-trip-btn { background-color: #17a2b8; color: white; } /* Xanh lam */
-/* ================================== */
+/* ======================================================= */
 
-/* === Edit Trip Form Styling (Mới) === */
+/* Edit Trip Form Styling */
 #edit-trip-form-container {
-    border: 1px solid #ffc107; /* Viền vàng để phân biệt */
+    border: 1px solid #ffc107;
     padding: 20px;
     border-radius: 6px;
-    background-color: #fffcf2; /* Nền vàng nhạt */
-    margin-top: 20px; /* Khoảng cách với nút hành động */
+    background-color: #fffcf2;
+    margin-top: 20px;
     margin-bottom: 25px;
 }
-#edit-trip-form h4 {
-    margin-top: 0;
-    color: #856404; /* Màu chữ vàng đậm */
-    border-bottom-color: #ffeeba; /* Đường kẻ vàng nhạt */
-}
-#cancel-edit-trip-btn { /* Nút hủy trong form sửa */
-    background-color: #6c757d;
-    color: white;
-}
-/* ================================== */
+#edit-trip-form h4 { margin-top: 0; color: #856404; border-bottom-color: #ffeeba; }
+#cancel-edit-trip-btn { background-color: #6c757d; color: white; }
 
 
 /* Add Passenger Form Toggle */
@@ -295,6 +312,10 @@ button[type="submit"]:hover { background-color: #0056b3; filter: none;}
 
     /* Responsive cho nút hành động chuyến đi */
     .trip-detail-actions { justify-content: center; }
+
+    /* Responsive cho nút phụ */
+    #detail-card-secondary-actions { top: 10px; right: 10px; } /* Điều chỉnh vị trí trên mobile */
+    #detail-card-secondary-actions .action-button { padding: 5px 8px; font-size: 0.8em; }
 
     /* Responsive cho bảng danh sách khách */
     .passenger-list-header { display: none; }
