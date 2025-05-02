@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Xe Ghép v8</title> <link rel="stylesheet" href="style.css">
+    <title>Quản lý Xe Ghép v9</title> <link rel="stylesheet" href="style.css">
     </head>
 <body>
     <h1>Quản lý Chuyến Đi Xe Ghép</h1>
@@ -36,7 +36,10 @@
         </div>
 
         <div class="card">
-            <h2><span class="icon">📑</span> Danh sách chuyến đi</h2>
+            <div class="view-toggle-controls">
+                 <h2 id="trip-list-title"><span class="icon">📑</span> Chuyến đi Sắp tới / Đang chạy</h2>
+                 <button id="view-mode-toggle-btn" class="action-button">Xem Lịch sử</button>
+            </div>
             <div id="trip-list">
                 <p>Đang tải danh sách...</p>
             </div>
@@ -50,7 +53,9 @@
                 <p>Đang tải thông tin chuyến đi...</p>
             </div>
 
-             <h3><span class="icon">👥</span> Quản lý Hành Khách</h3>
+            <div id="trip-action-buttons" class="trip-detail-actions">
+                </div>
+            <h3><span class="icon">👥</span> Quản lý Hành Khách</h3>
 
              <div id="add-passenger-toggle-area">
                  <button id="show-add-passenger-form-btn" class="action-button manage-btn"><span class="icon">➕</span> Thêm khách mới</button>
@@ -78,8 +83,7 @@
             </form>
 
             <h4>Danh sách hành khách đã đặt:</h4>
-            <div class="passenger-list-container">
-                <div class="passenger-list-header">
+            <div class="passenger-list-container"> <div class="passenger-list-header">
                     <div class="col-name">Tên khách (Số chỗ)</div>
                     <div class="col-contact">SĐT</div>
                     <div class="col-pickup">Điểm đón</div>
